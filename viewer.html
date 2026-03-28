@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angela Cashay · 3D</title>
+  <script src="https://cdn.jsdelivr.net/npm/babylonjs@7.0.0/babylon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babylonjs-loaders@7.0.0/babylonjs.loaders.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --accent: #c9a96e; --accent-mid: rgba(201,169,110,0.3); --text-dim: rgba(255,255,255,0.3); }
+    html, body { width: 100%; height: 100%; background: #080808; overflow: hidden; }
+
+    #app { width: 100vw; height: 100vh; position: relative; }
+    #renderCanvas { width: 100%; height: 100%; display: block; touch-action: none; }
+
+    /* Watermark */
+    #watermark {
+      position: absolute; bottom: 18px; left: 20px; z-index: 10;
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(201,169,110,0.4); pointer-events: none; user-select: none;
+    }
+
+    /* Reset button — only visible on share links */
+    #btnCreatorView {
+      position: absolute; bottom: 16px; right: 20px; z-index: 10;
+      background: rgba(8,8,8,0.7); border: 1px solid var(--accent-mid);
+      color: var(--accent); font-family: 'Jost', sans-serif;
+      font-size: 9px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 7px 14px; border-radius: 2px; cursor: pointer; transition: all 0.2s;
+      opacity: 0; pointer-events: none;
+    }
+    #btnCreatorView.visible { opacity: 1; pointer-events: all; }
+    #btnCreatorView:hover { background: rgba(201,169,110,0.12); }
+
+    /* Loader */
+    #loader {
+      position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; background: #080808;
+      opacity: 1; transition: opacity 0.5s;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    .loader-ring { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(201,169,110,0.15); border-top-color: var(--accent); animation: spin 0.9s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-family: 'Jost', sans-serif; font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+
+    /* No params message */
+    #noParams {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; opacity: 0; pointer-events: none;
+    }
+    #noParams.visible { opacity: 1; }
+    .np-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+    .np-sub { font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body>
+<div id="app">
+  <canvas id="renderCanvas"></canvas>
+
+  <div id="watermark">Angela Cashay</div>
+
+  <button id="btnCreatorView">↩ Creator View</button>
+
+  <div id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Loading…</div>
+  </div>
+
+  <div id="noParams">
+    <div class="np-title">No scene loaded</div>
+    <div class="np-sub">Open via a share link from the editor</div>
+  </div>
+</div>
+
+<script>
+const MODEL_BASE = 'https://raw.githubusercontent.com/AngelaCashay/AC-3D-Viewer/main/models/';
+
+const canvas = document.getElementById('renderCanvas');
+const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+let scene, camera, glowLayer, pipeline, hemiLight, dirLight, fillLight;
+let savedCam = null;
+
+function hexToColor3(hex) {
+  return new BABYLON.Color3(parseInt(hex.slice(1,3),16)/255,parseInt(hex.slice(3,5),16)/255,parseInt(hex.slice(5,7),16)/255);
+}
+
+function createScene() {
+  scene = new BABYLON.Scene(engine);
+  scene.clearColor = new BABYLON.Color4(0.031,0.031,0.031,1);
+  camera = new BABYLON.ArcRotateCamera('cam',-Math.PI/2,Math.PI/3,4,BABYLON.Vector3.Zero(),scene);
+  camera.attachControl(canvas,true);
+  camera.lowerRadiusLimit=0.1; camera.upperRadiusLimit=50; camera.wheelDeltaPercentage=0.01; camera.minZ=0.01;
+  hemiLight = new BABYLON.HemisphericLight('hemi',new BABYLON.Vector3(0,1,0),scene);
+  hemiLight.intensity=0.4;
+  dirLight = new BABYLON.DirectionalLight('dir',new BABYLON.Vector3(-1,-2,-1),scene);
+  dirLight.intensity=0.8;
+  fillLight = new BABYLON.PointLight('fill',new BABYLON.Vector3(2,1,2),scene);
+  fillLight.intensity=0.3;
+  glowLayer = new BABYLON.GlowLayer('glow',scene);
+  glowLayer.intensity=0.6; glowLayer.blurKernelSize=32;
+  pipeline = new BABYLON.DefaultRenderingPipeline('pipe',true,scene,[camera]);
+  pipeline.bloomEnabled=false; pipeline.depthOfFieldEnabled=false;
+  scene.createDefaultEnvironment({createGround:false,createSkybox:false});
+}
+
+function applySettings(p) {
+  const get=(k,fb)=>p.has(k)?p.get(k):fb;
+
+  // Background
+  const bg='#'+get('bg','080808');
+  const c=hexToColor3(bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1);
+
+  // Exposure
+  scene.imageProcessingConfiguration.exposure=parseFloat(get('exp','1'));
+
+  // Glow
+  const glowOn=get('glowOn','1')==='1';
+  const glowInt=parseFloat(get('glowInt','0.6'));
+  glowLayer.intensity=glowOn?glowInt:0;
+  glowLayer.blurKernelSize=parseFloat(get('glowBlur','32'));
+
+  // Lights
+  dirLight.intensity=parseFloat(get('keyInt','0.8'));
+  dirLight.diffuse=hexToColor3('#'+get('keyCol','fff4d9'));
+  hemiLight.intensity=parseFloat(get('ambInt','0.4'));
+  hemiLight.diffuse=hexToColor3('#'+get('ambCol','e6d9ff'));
+  fillLight.intensity=parseFloat(get('fillInt','0.3'));
+  fillLight.diffuse=hexToColor3('#'+get('fillCol','99b3ff'));
+
+  // Bloom
+  pipeline.bloomEnabled=get('bloom','0')==='1';
+  pipeline.bloomIntensity=parseFloat(get('bloomInt','0.5'));
+
+  // DOF
+  pipeline.depthOfFieldEnabled=get('dof','0')==='1';
+  pipeline.depthOfField.focusDistance=parseFloat(get('dofDist','10'))*1000;
+  pipeline.depthOfField.fStop=parseFloat(get('dofAp','0.05'));
+
+  // Auto rotate
+  const rotSpd=parseFloat(get('rotSpd','0.005'));
+  const autoRotate=get('rotate','0')==='1';
+  scene.registerBeforeRender(()=>{ if(autoRotate) camera.alpha+=rotSpd; });
+}
+
+function applyCameraFromParams(p) {
+  if(!p.has('camAlpha')) return;
+  camera.alpha=parseFloat(p.get('camAlpha'));
+  camera.beta=parseFloat(p.get('camBeta'));
+  camera.radius=parseFloat(p.get('camRadius'));
+  camera.target=new BABYLON.Vector3(
+    parseFloat(p.get('camTX')||0),
+    parseFloat(p.get('camTY')||0),
+    parseFloat(p.get('camTZ')||0)
+  );
+  // Save this as the creator view to return to
+  savedCam = {
+    alpha: camera.alpha, beta: camera.beta,
+    radius: camera.radius, target: camera.target.clone()
+  };
+  document.getElementById('btnCreatorView').classList.add('visible');
+}
+
+function restoreCreatorView() {
+  if(!savedCam) return;
+  camera.alpha=savedCam.alpha; camera.beta=savedCam.beta;
+  camera.radius=savedCam.radius; camera.target=savedCam.target.clone();
+}
+
+function loadModelFromURL(filename) {
+  const url = MODEL_BASE + encodeURIComponent(filename);
+  BABYLON.SceneLoader.ImportMesh('','',url,scene,(meshes)=>{
+    if(!meshes.length){ showNoParams(); return; }
+    document.getElementById('loader').classList.add('hidden');
+  },null,(sc,msg)=>{
+    console.error('Load error:',msg);
+    document.getElementById('loader').classList.add('hidden');
+    showNoParams();
+  });
+}
+
+function showNoParams() {
+  document.getElementById('loader').classList.add('hidden');
+  document.getElementById('noParams').classList.add('visible');
+}
+
+function init() {
+  const params = new URLSearchParams(window.location.search);
+
+  if(!params.has('bg') && !params.has('model')) {
+    showNoParams(); return;
+  }
+
+  createScene();
+  applySettings(params);
+
+  const modelName = params.get('model');
+  if(modelName && modelName !== 'none loaded') {
+    loadModelFromURL(modelName);
+    // Apply camera after short delay to let model load
+    setTimeout(()=>applyCameraFromParams(params), 2000);
+  } else {
+    document.getElementById('loader').classList.add('hidden');
+    showNoParams();
+  }
+
+  document.getElementById('btnCreatorView').addEventListener('click', restoreCreatorView);
+  engine.runRenderLoop(()=>scene.render());
+  window.addEventListener('resize',()=>engine.resize());
+}
+
+init();
+</script>
+</body>
+</html>
