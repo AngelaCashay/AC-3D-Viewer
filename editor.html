@@ -167,7 +167,7 @@
       <div class="drop-ring"><div class="drop-icon">✦</div></div>
       <div class="drop-title">Drop your GLB here</div>
       <div class="drop-sub">glb · gltf · obj · stl</div>
-      <input type="file" id="fileInput" accept=".glb,.gltf,.obj,.stl" style="display:none" />
+      <input type="file" id="fileInput" accept=".obj" style="display:none" />
       <label for="fileInput" class="drop-btn" id="dropBtn">Choose File</label>
     </div>
     <div id="loader"><div class="loader-ring"></div><div class="loader-text">Loading model…</div></div>
@@ -464,10 +464,14 @@ function createScene() {
   pipeline.bloomEnabled=false; pipeline.bloomIntensity=0.5; pipeline.bloomThreshold=0.3; pipeline.bloomKernel=64;
   pipeline.depthOfFieldEnabled=false; pipeline.depthOfField.focusDistance=10000; pipeline.depthOfField.fStop=0.05; pipeline.depthOfField.focalLength=50;
   pipeline.chromaticAberrationEnabled=false; pipeline.chromaticAberration.aberrationAmount=0;
-  pipeline.grainEnabled=false; pipeline.grain.intensity=0.2; pipeline.grain.animated=true;
-  pipeline.vignetteEnabled=false; pipeline.vignette.vignetteWeight=0.5;
+  pipeline.grainEnabled=false; pipeline.grain.intensity=10; pipeline.grain.animated=true;
   pipeline.sharpenEnabled=false; pipeline.sharpen.edgeAmount=0;
-  pipeline.imageProcessing.contrast=1; pipeline.imageProcessing.exposure=1;
+  pipeline.imageProcessingEnabled=true;
+  pipeline.imageProcessing.contrast=1;
+  pipeline.imageProcessing.exposure=1;
+  pipeline.imageProcessing.vignetteEnabled=false;
+  pipeline.imageProcessing.vignetteWeight=0.5;
+  pipeline.imageProcessing.vignetteCameraFov=0.5;
 
   scene.createDefaultEnvironment({createGround:false,createSkybox:false});
 
@@ -484,53 +488,30 @@ function loadModel(file) {
   currentMeshes.forEach(m=>{try{m.dispose();}catch(e){}});
   currentMeshes=[];
 
-  const ext = '.' + file.name.split('.').pop().toLowerCase();
-  const reader = new FileReader();
+  // Register file in Babylon's virtual filesystem then load by name
+  BABYLON.FilesInput.FilesToLoad = BABYLON.FilesInput.FilesToLoad || {};
+  BABYLON.FilesInput.FilesToLoad[file.name.toLowerCase()] = file;
 
-  reader.onload = function(e) {
-    const data = e.target.result;
-    // Create a named blob so Babylon sees the extension
-    const namedBlob = new Blob([data]);
-    const blobUrl = URL.createObjectURL(namedBlob);
-    // Append extension as a query hint via BABYLON's file tools
-    BABYLON.SceneLoader.ImportMesh(
-      '', blobUrl, '', scene,
-      (meshes) => {
-        currentMeshes = meshes;
-        frameCamera();
-        applyWireframe();
-        document.getElementById('loader').classList.remove('visible');
-        document.getElementById('dropZone').classList.add('hidden');
-        document.getElementById('fileNameText').textContent = file.name;
-        URL.revokeObjectURL(blobUrl);
-      },
-      null,
-      (sc, msg) => {
-        URL.revokeObjectURL(blobUrl);
-        // Second attempt: register file in Babylon's file system
-        BABYLON.FilesInput.FilesToLoad = {};
-        BABYLON.FilesInput.FilesToLoad[file.name.toLowerCase()] = file;
-        BABYLON.SceneLoader.ImportMesh(
-          '', 'file:', file.name, scene,
-          (meshes) => {
-            currentMeshes = meshes;
-            frameCamera();
-            applyWireframe();
-            document.getElementById('loader').classList.remove('visible');
-            document.getElementById('dropZone').classList.add('hidden');
-            document.getElementById('fileNameText').textContent = file.name;
-          },
-          null,
-          (sc2, msg2) => {
-            document.getElementById('loader').classList.remove('visible');
-            alert('Could not load file. Error: ' + msg2);
-          }
-        );
-      },
-      ext
-    );
-  };
-  reader.readAsArrayBuffer(file);
+  BABYLON.SceneLoader.ImportMesh(
+    '',
+    'file:',
+    file.name,
+    scene,
+    (meshes) => {
+      currentMeshes = meshes;
+      frameCamera();
+      applyWireframe();
+      document.getElementById('loader').classList.remove('visible');
+      document.getElementById('dropZone').classList.add('hidden');
+      document.getElementById('fileNameText').textContent = file.name;
+    },
+    null,
+    (sc, msg) => {
+      document.getElementById('loader').classList.remove('visible');
+      console.error('Load error:', msg);
+      alert('Load failed: ' + msg);
+    }
+  );
 }
 
 function frameCamera() {
@@ -774,11 +755,11 @@ function bindControls() {
 
   // Vignette
   const tglVig=document.getElementById('tglVig');
-  tglVig.addEventListener('click',()=>{tglVig.classList.toggle('on');pipeline.vignetteEnabled=tglVig.classList.contains('on');});
-  bindSlider('sldVig','valVig',2,v=>{pipeline.vignette.vignetteWeight=v*4;});
+  tglVig.addEventListener('click',()=>{ tglVig.classList.toggle('on'); pipeline.imageProcessing.vignetteEnabled=tglVig.classList.contains('on'); });
+  bindSlider('sldVig','valVig',2,v=>{ pipeline.imageProcessing.vignetteWeight=v*4; });
   document.getElementById('colVig').addEventListener('input',e=>{
     const c=hexToColor3(e.target.value);
-    pipeline.vignette.vignetteColor=new BABYLON.Color4(c.r,c.g,c.b,1);
+    pipeline.imageProcessing.vignetteColor=new BABYLON.Color4(c.r,c.g,c.b,1);
   });
 
   // Grain
