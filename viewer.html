@@ -54,59 +54,59 @@ function createScene(p) {
   const alpha=parseFloat(p.get('ca')||(-Math.PI/2));
   const beta=parseFloat(p.get('cb')||(Math.PI/3));
   const radius=parseFloat(p.get('cr')||4);
-  const tx=parseFloat(p.get('ctx')||0);
-  const ty=parseFloat(p.get('cty')||0);
-  const tz=parseFloat(p.get('ctz')||0);
+  const tx=parseFloat(p.get('camTX')||0);
+  const ty=parseFloat(p.get('camTY')||0);
+  const tz=parseFloat(p.get('camTZ')||0);
   cam=new BABYLON.ArcRotateCamera('c',alpha,beta,radius,new BABYLON.Vector3(tx,ty,tz),scene);
   cam.attachControl(canvas,true);
   cam.lowerRadiusLimit=0.1; cam.upperRadiusLimit=100; cam.wheelDeltaPercentage=0.01; cam.minZ=0.001;
-  cam.fov=parseFloat(p.get('fv')||0.8);
+  cam.fov=parseFloat(p.get('fov')||0.8);
 
   // Save creator view
   savedCam={alpha,beta,radius,target:new BABYLON.Vector3(tx,ty,tz)};
   if(p.has('ca')) G('bCV').classList.add('v');
 
   hemi=new BABYLON.HemisphericLight('h',new BABYLON.Vector3(0,1,0),scene);
-  hemi.intensity=parseFloat(p.get('aI')||0.4);
-  hemi.diffuse=h2c('#'+(p.get('aC')||'e6d9ff'));
+  hemi.intensity=parseFloat(p.get('ambInt')||0.4);
+  hemi.diffuse=h2c('#'+(p.get('ambCol')||'e6d9ff'));
   hemi.groundColor=h2c('#'+(p.get('gr')||'1a1412'));
 
-  dir=new BABYLON.DirectionalLight('d',new BABYLON.Vector3(parseFloat(p.get('kX')||-1),parseFloat(p.get('kY')||-2),parseFloat(p.get('kZ')||-1)),scene);
-  dir.intensity=parseFloat(p.get('kI')||0.8);
-  dir.diffuse=h2c('#'+(p.get('kC')||'fff4d9'));
+  dir=new BABYLON.DirectionalLight('d',new BABYLON.Vector3(parseFloat(p.get('keyX')||-1),parseFloat(p.get('keyY')||-2),parseFloat(p.get('keyZ')||-1)),scene);
+  dir.intensity=parseFloat(p.get('keyInt')||0.8);
+  dir.diffuse=h2c('#'+(p.get('keyCol')||'fff4d9'));
   dir.specular=p.get('sp')==='0'?new BABYLON.Color3(0,0,0):new BABYLON.Color3(1,1,1);
 
-  fill=new BABYLON.PointLight('f',new BABYLON.Vector3(parseFloat(p.get('fX')||2),parseFloat(p.get('fY')||1),parseFloat(p.get('fZ')||2)),scene);
-  fill.intensity=parseFloat(p.get('fI')||0.3);
-  fill.diffuse=h2c('#'+(p.get('fC')||'99b3ff'));
+  fill=new BABYLON.PointLight('f',new BABYLON.Vector3(parseFloat(p.get('fillX')||2),parseFloat(p.get('fillY')||1),parseFloat(p.get('fillZ')||2)),scene);
+  fill.intensity=parseFloat(p.get('fillInt')||0.3);
+  fill.diffuse=h2c('#'+(p.get('fillCol')||'99b3ff'));
 
-  fill2=new BABYLON.PointLight('f2',new BABYLON.Vector3(parseFloat(p.get('f2X')||-2),parseFloat(p.get('f2Y')||2),parseFloat(p.get('f2Z')||-2)),scene);
-  fill2.intensity=p.get('f2')==='1'?parseFloat(p.get('f2I')||0.2):0;
-  fill2.diffuse=h2c('#'+(p.get('f2C')||'ffccaa'));
+  fill2=new BABYLON.PointLight('f2',new BABYLON.Vector3(parseFloat(p.get('fill2X')||-2),parseFloat(p.get('fill2Y')||2),parseFloat(p.get('fill2Z')||-2)),scene);
+  fill2.intensity=p.get('f2')==='1'?parseFloat(p.get('fill2Int')||0.2):0;
+  fill2.diffuse=h2c('#'+(p.get('fill2Col')||'ffccaa'));
 
   glow=new BABYLON.GlowLayer('g',scene);
-  const gOn=p.get('gOn')!=='0';
-  glow.intensity=gOn?parseFloat(p.get('gI')||0.6):0;
-  glow.blurKernelSize=parseFloat(p.get('gB')||32);
+  const gOn=p.get('glowOn')!=='0';
+  glow.intensity=gOn?parseFloat(p.get('glowInt')||0.6):0;
+  glow.blurKernelSize=parseFloat(p.get('glowBlur')||32);
 
   pipe=new BABYLON.DefaultRenderingPipeline('p',true,scene,[cam]);
-  pipe.bloomEnabled=p.get('blOn')==='1';
-  pipe.bloomIntensity=parseFloat(p.get('blI')||0.5);
-  pipe.bloomThreshold=parseFloat(p.get('blT')||0.3);
-  pipe.bloomKernel=parseFloat(p.get('blK')||64);
-  pipe.depthOfFieldEnabled=p.get('dfOn')==='1';
-  try{pipe.depthOfField.focusDistance=parseFloat(p.get('dfD')||10)*1000;pipe.depthOfField.fStop=parseFloat(p.get('dfA')||0.05);pipe.depthOfField.focalLength=parseFloat(p.get('dfL')||50);}catch(e){}
+  pipe.bloomEnabled=p.get('bloom')==='1';
+  pipe.bloomIntensity=parseFloat(p.get('bloomInt')||0.5);
+  pipe.bloomThreshold=parseFloat(p.get('bloomThresh')||0.3);
+  pipe.bloomKernel=parseFloat(p.get('bloomKernel')||64);
+  pipe.depthOfFieldEnabled=p.get('dof')==='1';
+  try{pipe.depthOfField.focusDistance=parseFloat(p.get('dofDist')||10)*1000;pipe.depthOfField.fStop=parseFloat(p.get('dofAp')||0.05);pipe.depthOfField.focalLength=parseFloat(p.get('dofFocal')||50);}catch(e){}
   pipe.imageProcessingEnabled=true;
   pipe.imageProcessing.exposure=parseFloat(p.get('ex')||1);
   pipe.imageProcessing.contrast=parseFloat(p.get('co')||1);
-  pipe.imageProcessing.vignetteEnabled=p.get('vgOn')==='1';
-  pipe.imageProcessing.vignetteWeight=parseFloat(p.get('vgI')||0.5)*4;
-  const vgC=h2c('#'+(p.get('vgC')||'000000'));
+  pipe.imageProcessing.vignetteEnabled=p.get('vig')==='1';
+  pipe.imageProcessing.vignetteWeight=parseFloat(p.get('vigInt')||0.5)*4;
+  const vgC=h2c('#'+(p.get('vigCol')||'000000'));
   pipe.imageProcessing.vignetteColor=new BABYLON.Color4(vgC.r,vgC.g,vgC.b,1);
 
   // Grain
-  pipe.grainEnabled=true; pipe.grain.intensity=10; pipe.grain.animated=true; pipe.grainEnabled=p.get('gnOn')==='1';
-  if(pipe.grainEnabled) pipe.grain.intensity=parseFloat(p.get('gnI')||0.2)*50;
+  pipe.grainEnabled=true; pipe.grain.intensity=10; pipe.grain.animated=true; pipe.grainEnabled=p.get('grain')==='1';
+  if(pipe.grainEnabled) pipe.grain.intensity=parseFloat(p.get('grainInt')||0.2)*50;
 
   // Chromatic
   const ch=parseFloat(p.get('ch')||0);
