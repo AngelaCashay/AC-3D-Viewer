@@ -9,48 +9,34 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap');
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --accent: #c9a96e; --accent-mid: rgba(201,169,110,0.3); --text-dim: rgba(255,255,255,0.3); }
+    :root { --accent: #c9a96e; --accent-mid: rgba(201,169,110,0.3); }
     html, body { width: 100%; height: 100%; background: #080808; overflow: hidden; }
-
     #app { width: 100vw; height: 100vh; position: relative; }
     #renderCanvas { width: 100%; height: 100%; display: block; touch-action: none; }
-
-    /* Watermark */
     #watermark {
       position: absolute; bottom: 18px; left: 20px; z-index: 10;
-      font-family: 'Cormorant Garamond', serif; font-weight: 300;
-      font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase;
-      color: rgba(201,169,110,0.4); pointer-events: none; user-select: none;
+      font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 12px;
+      letter-spacing: 0.28em; text-transform: uppercase; color: rgba(201,169,110,0.4);
+      pointer-events: none; user-select: none;
     }
-
-    /* Reset button — only visible on share links */
     #btnCreatorView {
       position: absolute; bottom: 16px; right: 20px; z-index: 10;
-      background: rgba(8,8,8,0.7); border: 1px solid var(--accent-mid);
-      color: var(--accent); font-family: 'Jost', sans-serif;
-      font-size: 9px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase;
-      padding: 7px 14px; border-radius: 2px; cursor: pointer; transition: all 0.2s;
-      opacity: 0; pointer-events: none;
+      background: rgba(8,8,8,0.7); border: 1px solid var(--accent-mid); color: var(--accent);
+      font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 300;
+      letter-spacing: 0.2em; text-transform: uppercase; padding: 7px 14px; border-radius: 2px;
+      cursor: pointer; transition: all 0.2s; opacity: 0; pointer-events: none;
     }
     #btnCreatorView.visible { opacity: 1; pointer-events: all; }
     #btnCreatorView:hover { background: rgba(201,169,110,0.12); }
-
-    /* Loader */
     #loader {
       position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; background: #080808;
-      opacity: 1; transition: opacity 0.5s;
+      align-items: center; justify-content: center; background: #080808; opacity: 1; transition: opacity 0.5s;
     }
     #loader.hidden { opacity: 0; pointer-events: none; }
     .loader-ring { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(201,169,110,0.15); border-top-color: var(--accent); animation: spin 0.9s linear infinite; margin-bottom: 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loader-text { font-family: 'Jost', sans-serif; font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
-
-    /* No params message */
-    #noParams {
-      position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; opacity: 0; pointer-events: none;
-    }
+    #noParams { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
     #noParams.visible { opacity: 1; }
     .np-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
     .np-sub { font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
@@ -59,16 +45,9 @@
 <body>
 <div id="app">
   <canvas id="renderCanvas"></canvas>
-
   <div id="watermark">Angela Cashay</div>
-
   <button id="btnCreatorView">↩ Creator View</button>
-
-  <div id="loader">
-    <div class="loader-ring"></div>
-    <div class="loader-text">Loading…</div>
-  </div>
-
+  <div id="loader"><div class="loader-ring"></div><div class="loader-text">Loading…</div></div>
   <div id="noParams">
     <div class="np-title">No scene loaded</div>
     <div class="np-sub">Open via a share link from the editor</div>
@@ -77,10 +56,9 @@
 
 <script>
 const MODEL_BASE = 'https://raw.githubusercontent.com/AngelaCashay/AC-3D-Viewer/main/models/';
-
 const canvas = document.getElementById('renderCanvas');
 const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
-let scene, camera, glowLayer, pipeline, hemiLight, dirLight, fillLight;
+let scene, camera, glowLayer, pipeline, hemiLight, dirLight, fillLight, fillLight2;
 let savedCam = null;
 
 function hexToColor3(hex) {
@@ -94,59 +72,115 @@ function createScene() {
   camera.attachControl(canvas,true);
   camera.lowerRadiusLimit=0.1; camera.upperRadiusLimit=50; camera.wheelDeltaPercentage=0.01; camera.minZ=0.01;
   hemiLight = new BABYLON.HemisphericLight('hemi',new BABYLON.Vector3(0,1,0),scene);
-  hemiLight.intensity=0.4;
   dirLight = new BABYLON.DirectionalLight('dir',new BABYLON.Vector3(-1,-2,-1),scene);
-  dirLight.intensity=0.8;
   fillLight = new BABYLON.PointLight('fill',new BABYLON.Vector3(2,1,2),scene);
-  fillLight.intensity=0.3;
+  fillLight2 = new BABYLON.PointLight('fill2',new BABYLON.Vector3(-2,2,-2),scene);
+  fillLight2.intensity=0;
   glowLayer = new BABYLON.GlowLayer('glow',scene);
-  glowLayer.intensity=0.6; glowLayer.blurKernelSize=32;
   pipeline = new BABYLON.DefaultRenderingPipeline('pipe',true,scene,[camera]);
-  pipeline.bloomEnabled=false; pipeline.depthOfFieldEnabled=false;
   scene.createDefaultEnvironment({createGround:false,createSkybox:false});
 }
 
 function applySettings(p) {
   const get=(k,fb)=>p.has(k)?p.get(k):fb;
+  const f=k=>parseFloat(get(k,0));
+  const b=k=>get(k,'0')==='1';
 
-  // Background
+  // Background & image
   const bg='#'+get('bg','080808');
   const c=hexToColor3(bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1);
+  pipeline.imageProcessingConfiguration.exposure=f('exp')||1;
+  pipeline.imageProcessingConfiguration.contrast=f('contrast')||1;
+  const tone=parseInt(get('tone','0'));
+  pipeline.imageProcessingConfiguration.toneMappingEnabled=tone!==3;
 
-  // Exposure
-  scene.imageProcessingConfiguration.exposure=parseFloat(get('exp','1'));
+  // Saturation
+  const sat=f('sat')||1;
+  if(sat!==1) {
+    pipeline.imageProcessing.colorCurvesEnabled=true;
+    if(!pipeline.imageProcessing.colorCurves) pipeline.imageProcessing.colorCurves=new BABYLON.ColorCurves();
+    pipeline.imageProcessing.colorCurves.globalSaturation=sat*100-100;
+  }
 
   // Glow
-  const glowOn=get('glowOn','1')==='1';
-  const glowInt=parseFloat(get('glowInt','0.6'));
+  const glowOn=b('glowOn'); const glowInt=f('glowInt')||0.6;
   glowLayer.intensity=glowOn?glowInt:0;
-  glowLayer.blurKernelSize=parseFloat(get('glowBlur','32'));
+  glowLayer.blurKernelSize=f('glowBlur')||32;
 
-  // Lights
-  dirLight.intensity=parseFloat(get('keyInt','0.8'));
+  // Key light
+  dirLight.intensity=f('keyInt')||0.8;
   dirLight.diffuse=hexToColor3('#'+get('keyCol','fff4d9'));
-  hemiLight.intensity=parseFloat(get('ambInt','0.4'));
+  dirLight.direction=new BABYLON.Vector3(f('keyX')||-1,f('keyY')||-2,f('keyZ')||-1);
+  dirLight.specular=b('spec')?new BABYLON.Color3(1,1,1):new BABYLON.Color3(0,0,0);
+
+  // Ambient
+  hemiLight.intensity=f('ambInt')||0.4;
   hemiLight.diffuse=hexToColor3('#'+get('ambCol','e6d9ff'));
-  fillLight.intensity=parseFloat(get('fillInt','0.3'));
+  hemiLight.groundColor=hexToColor3('#'+get('groundCol','1a1412'));
+
+  // Fill
+  fillLight.intensity=f('fillInt')||0.3;
   fillLight.diffuse=hexToColor3('#'+get('fillCol','99b3ff'));
+  fillLight.position=new BABYLON.Vector3(f('fillX')||2,f('fillY')||1,f('fillZ')||2);
+
+  // Fill 2
+  const fill2On=b('fill2On');
+  fillLight2.intensity=fill2On?f('fill2Int')||0.2:0;
+  fillLight2.diffuse=hexToColor3('#'+get('fill2Col','ffccaa'));
+  fillLight2.position=new BABYLON.Vector3(f('fill2X')||-2,f('fill2Y')||2,f('fill2Z')||-2);
 
   // Bloom
-  pipeline.bloomEnabled=get('bloom','0')==='1';
-  pipeline.bloomIntensity=parseFloat(get('bloomInt','0.5'));
+  pipeline.bloomEnabled=b('bloom');
+  pipeline.bloomIntensity=f('bloomInt')||0.5;
+  pipeline.bloomThreshold=f('bloomThresh')||0.3;
+  pipeline.bloomKernel=f('bloomKernel')||64;
 
   // DOF
-  pipeline.depthOfFieldEnabled=get('dof','0')==='1';
-  pipeline.depthOfField.focusDistance=parseFloat(get('dofDist','10'))*1000;
-  pipeline.depthOfField.fStop=parseFloat(get('dofAp','0.05'));
+  pipeline.depthOfFieldEnabled=b('dof');
+  pipeline.depthOfField.focusDistance=(f('dofDist')||10)*1000;
+  pipeline.depthOfField.fStop=f('dofAp')||0.05;
+  pipeline.depthOfField.focalLength=f('dofFocal')||50;
+
+  // Vignette
+  pipeline.vignetteEnabled=b('vig');
+  pipeline.vignette.vignetteWeight=(f('vigInt')||0.5)*4;
+  const vc=hexToColor3('#'+get('vigCol','000000'));
+  pipeline.vignette.vignetteColor=new BABYLON.Color4(vc.r,vc.g,vc.b,1);
+
+  // Grain
+  pipeline.grainEnabled=b('grain');
+  pipeline.grain.intensity=(f('grainInt')||0.2)*50;
+  pipeline.grain.animated=true;
+
+  // Chromatic
+  const chrom=f('chrom')||0;
+  pipeline.chromaticAberrationEnabled=chrom>0;
+  pipeline.chromaticAberration.aberrationAmount=chrom*10;
+
+  // Sharpening
+  const sharp=f('sharp')||0;
+  pipeline.sharpenEnabled=sharp>0;
+  pipeline.sharpen.edgeAmount=sharp;
+
+  // Camera FOV
+  camera.fov=f('fov')||0.8;
 
   // Auto rotate
-  const rotSpd=parseFloat(get('rotSpd','0.005'));
-  const autoRotate=get('rotate','0')==='1';
-  scene.registerBeforeRender(()=>{ if(autoRotate) camera.alpha+=rotSpd; });
+  const autoRotate=b('rotate');
+  const rotSpd=f('rotSpd')||0.005;
+  const rotDir=parseFloat(get('rotDir','1'));
+  scene.registerBeforeRender(()=>{ if(autoRotate) camera.alpha+=rotSpd*rotDir; });
+
+  // Wireframe
+  if(b('wire')) {
+    scene.meshes.forEach(m=>{if(m.material) m.material.wireframe=true;});
+  }
 }
 
 function applyCameraFromParams(p) {
   if(!p.has('camAlpha')) return;
+  // Detach and reattach to force position update
+  camera.detachControl();
   camera.alpha=parseFloat(p.get('camAlpha'));
   camera.beta=parseFloat(p.get('camBeta'));
   camera.radius=parseFloat(p.get('camRadius'));
@@ -155,11 +189,8 @@ function applyCameraFromParams(p) {
     parseFloat(p.get('camTY')||0),
     parseFloat(p.get('camTZ')||0)
   );
-  // Save this as the creator view to return to
-  savedCam = {
-    alpha: camera.alpha, beta: camera.beta,
-    radius: camera.radius, target: camera.target.clone()
-  };
+  camera.attachControl(canvas,true);
+  savedCam={alpha:camera.alpha,beta:camera.beta,radius:camera.radius,target:camera.target.clone()};
   document.getElementById('btnCreatorView').classList.add('visible');
 }
 
@@ -169,17 +200,23 @@ function restoreCreatorView() {
   camera.radius=savedCam.radius; camera.target=savedCam.target.clone();
 }
 
-function loadModelFromURL(filename, params) {
-  const url = MODEL_BASE + encodeURIComponent(filename);
+function loadModelFromURL(filename,params) {
+  const url=MODEL_BASE+encodeURIComponent(filename);
   BABYLON.SceneLoader.ImportMesh('','',url,scene,(meshes)=>{
-    if(!meshes.length){ showNoParams(); return; }
-
-    // Apply settings AFTER model is loaded so everything renders correctly
+    if(!meshes.length){showNoParams();return;}
     applySettings(params);
-
-    // Apply camera AFTER model loads
-    applyCameraFromParams(params);
-
+    // Apply camera BEFORE the engine renders the next frame
+    // so auto-frame never gets a chance to run
+    if(params.has('camAlpha')) {
+      applyCameraFromParams(params);
+    } else {
+      // No saved camera — auto frame
+      const bounds=scene.getWorldExtends();
+      const size=bounds.max.subtract(bounds.min);
+      camera.target=bounds.min.add(size.scale(0.5));
+      camera.radius=Math.max(size.x,size.y,size.z)*2;
+      camera.alpha=-Math.PI/2; camera.beta=Math.PI/3;
+    }
     document.getElementById('loader').classList.add('hidden');
   },null,(sc,msg)=>{
     console.error('Load error:',msg);
@@ -194,26 +231,18 @@ function showNoParams() {
 }
 
 function init() {
-  const params = new URLSearchParams(window.location.search);
-
-  if(!params.has('bg') && !params.has('model')) {
-    showNoParams(); return;
-  }
-
+  const params=new URLSearchParams(window.location.search);
+  if(!params.has('bg')&&!params.has('model')){showNoParams();return;}
   createScene();
-
-  const modelName = params.get('model');
-  if(modelName && modelName !== 'none loaded') {
-    // Settings + camera applied inside callback after model loads
-    loadModelFromURL(modelName, params);
+  const modelName=params.get('model');
+  if(modelName&&modelName!=='none loaded'){
+    loadModelFromURL(modelName,params);
   } else {
-    // No model — still apply visual settings
     applySettings(params);
     document.getElementById('loader').classList.add('hidden');
     showNoParams();
   }
-
-  document.getElementById('btnCreatorView').addEventListener('click', restoreCreatorView);
+  document.getElementById('btnCreatorView').addEventListener('click',restoreCreatorView);
   engine.runRenderLoop(()=>scene.render());
   window.addEventListener('resize',()=>engine.resize());
 }

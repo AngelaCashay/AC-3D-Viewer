@@ -13,8 +13,8 @@
     :root {
       --bg: #080808; --panel: #0d0d0d; --panel-border: rgba(255,255,255,0.06);
       --accent: #c9a96e; --accent-dim: rgba(201,169,110,0.12); --accent-mid: rgba(201,169,110,0.3);
-      --text: rgba(255,255,255,0.82); --text-dim: rgba(255,255,255,0.32); --text-muted: rgba(255,255,255,0.18);
-      --panel-w: 260px;
+      --text-dim: rgba(255,255,255,0.32); --text-muted: rgba(255,255,255,0.18);
+      --panel-w: 280px;
     }
     html, body { width: 100%; height: 100%; background: var(--bg); overflow: hidden; font-family: 'Jost', sans-serif; }
     #app { width: 100vw; height: 100vh; display: grid; grid-template-columns: 1fr var(--panel-w); grid-template-rows: 48px 1fr 36px; }
@@ -62,6 +62,7 @@
     .drop-btn:hover { background: var(--accent-dim); }
     #canvasWrap.drag-over .drop-ring { border-color: rgba(201,169,110,0.5); }
 
+    /* Panel */
     #panel {
       grid-column: 2; grid-row: 2; background: var(--panel); border-left: 1px solid var(--panel-border);
       overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; transition: width 0.25s ease;
@@ -70,39 +71,54 @@
     #panel::-webkit-scrollbar { width: 3px; }
     #panel::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.2); border-radius: 2px; }
 
-    .panel-section { padding: 16px 16px 12px; border-bottom: 1px solid var(--panel-border); }
+    .panel-section { padding: 14px 16px 10px; border-bottom: 1px solid var(--panel-border); }
     .section-label {
       font-size: 8px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent);
-      opacity: 0.7; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+      opacity: 0.7; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
     }
     .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(201,169,110,0.12); }
-    .presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+    .presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
     .preset-btn {
       background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); color: var(--text-dim);
       font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 300;
-      letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 6px; border-radius: 2px; cursor: pointer; transition: all 0.18s; text-align: center;
+      letter-spacing: 0.12em; text-transform: uppercase; padding: 7px 4px; border-radius: 2px; cursor: pointer; transition: all 0.18s; text-align: center;
     }
     .preset-btn:hover, .preset-btn.active { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-dim); }
-    .ctrl-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+
+    .ctrl-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
     .ctrl-row:last-child { margin-bottom: 0; }
     .ctrl-label { display: flex; justify-content: space-between; align-items: center; }
-    .ctrl-name { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+    .ctrl-name { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
     .ctrl-val { font-size: 9px; color: var(--accent); opacity: 0.8; font-family: monospace; }
+
     input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px; cursor: pointer; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: none; box-shadow: 0 0 6px rgba(201,169,110,0.4); }
-    .color-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+
+    .color-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .color-row:last-child { margin-bottom: 0; }
-    .color-name { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); flex: 1; }
+    .color-name { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); flex: 1; }
     input[type=color] { -webkit-appearance: none; appearance: none; width: 28px; height: 18px; border: 1px solid var(--panel-border); border-radius: 2px; background: none; cursor: pointer; padding: 1px; }
     input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type=color]::-webkit-color-swatch { border: none; border-radius: 1px; }
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .toggle-row:last-child { margin-bottom: 0; }
-    .toggle-name { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
-    .toggle { width: 28px; height: 14px; border-radius: 7px; background: rgba(255,255,255,0.08); border: 1px solid var(--panel-border); cursor: pointer; position: relative; transition: background 0.2s; }
+    .toggle-name { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+    .toggle { width: 28px; height: 14px; border-radius: 7px; background: rgba(255,255,255,0.08); border: 1px solid var(--panel-border); cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
     .toggle.on { background: var(--accent-dim); border-color: var(--accent-mid); }
     .toggle::after { content: ''; position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); top: 2px; left: 2px; transition: all 0.2s; }
     .toggle.on::after { left: 16px; background: var(--accent); }
+
+    /* Select dropdown */
+    .select-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .select-name { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+    select {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--panel-border); color: var(--text-dim);
+      font-family: 'Jost', sans-serif; font-size: 9px; letter-spacing: 0.1em;
+      padding: 4px 8px; border-radius: 2px; cursor: pointer; outline: none;
+    }
+    select:focus { border-color: var(--accent-mid); color: var(--accent); }
 
     #statusBar {
       grid-column: 1 / -1; grid-row: 3; display: flex; align-items: center; justify-content: space-between;
@@ -114,8 +130,7 @@
 
     #loader {
       position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; background: rgba(8,8,8,0.92);
-      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+      align-items: center; justify-content: center; background: rgba(8,8,8,0.92); opacity: 0; pointer-events: none; transition: opacity 0.25s;
     }
     #loader.visible { opacity: 1; pointer-events: all; }
     .loader-ring { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(201,169,110,0.15); border-top-color: var(--accent); animation: spin 0.9s linear infinite; margin-bottom: 16px; }
@@ -124,10 +139,9 @@
 
     #toast {
       position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
-      background: rgba(201,169,110,0.15); border: 1px solid var(--accent-mid);
-      color: var(--accent); font-family: 'Jost', sans-serif; font-size: 10px;
-      letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 24px;
-      border-radius: 2px; z-index: 100; opacity: 0; pointer-events: none;
+      background: rgba(201,169,110,0.15); border: 1px solid var(--accent-mid); color: var(--accent);
+      font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 10px 24px; border-radius: 2px; z-index: 100; opacity: 0; pointer-events: none;
       transition: opacity 0.3s ease; white-space: nowrap;
     }
     #toast.show { opacity: 1; }
@@ -160,6 +174,8 @@
   </div>
 
   <div id="panel">
+
+    <!-- PRESETS -->
     <div class="panel-section">
       <div class="section-label">Presets</div>
       <div class="presets-grid">
@@ -171,6 +187,8 @@
         <button class="preset-btn" data-preset="void">Void</button>
       </div>
     </div>
+
+    <!-- GLOW -->
     <div class="panel-section">
       <div class="section-label">Glow</div>
       <div class="toggle-row"><span class="toggle-name">Enable</span><div class="toggle on" id="tglGlow"></div></div>
@@ -182,8 +200,10 @@
         <div class="ctrl-label"><span class="ctrl-name">Blur Radius</span><span class="ctrl-val" id="valGlowBlur">32</span></div>
         <input type="range" id="sldGlowBlur" min="4" max="128" step="4" value="32" />
       </div>
-      <div class="color-row"><span class="color-name">Glow Tint</span><input type="color" id="colGlow" value="#c9a96e" /></div>
+      <div class="color-row"><span class="color-name">Tint Color</span><input type="color" id="colGlow" value="#c9a96e" /></div>
     </div>
+
+    <!-- BACKGROUND -->
     <div class="panel-section">
       <div class="section-label">Background</div>
       <div class="color-row"><span class="color-name">Color</span><input type="color" id="colBg" value="#080808" /></div>
@@ -191,65 +211,198 @@
         <div class="ctrl-label"><span class="ctrl-name">Exposure</span><span class="ctrl-val" id="valExp">1.00</span></div>
         <input type="range" id="sldExp" min="0.1" max="3" step="0.01" value="1" />
       </div>
-    </div>
-    <div class="panel-section">
-      <div class="section-label">Lighting</div>
       <div class="ctrl-row">
-        <div class="ctrl-label"><span class="ctrl-name">Key Light</span><span class="ctrl-val" id="valKey">0.80</span></div>
+        <div class="ctrl-label"><span class="ctrl-name">Contrast</span><span class="ctrl-val" id="valContrast">1.00</span></div>
+        <input type="range" id="sldContrast" min="0" max="2" step="0.01" value="1" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Saturation</span><span class="ctrl-val" id="valSat">1.00</span></div>
+        <input type="range" id="sldSat" min="0" max="2" step="0.01" value="1" />
+      </div>
+      <div class="select-row">
+        <span class="select-name">Tone Map</span>
+        <select id="selTone">
+          <option value="0">Standard</option>
+          <option value="1">ACES</option>
+          <option value="2">Reinhard</option>
+          <option value="3">None</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- KEY LIGHT -->
+    <div class="panel-section">
+      <div class="section-label">Key Light</div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Intensity</span><span class="ctrl-val" id="valKey">0.80</span></div>
         <input type="range" id="sldKey" min="0" max="3" step="0.01" value="0.8" />
       </div>
-      <div class="color-row"><span class="color-name">Key Color</span><input type="color" id="colKey" value="#fff4d9" /></div>
+      <div class="color-row"><span class="color-name">Color</span><input type="color" id="colKey" value="#fff4d9" /></div>
       <div class="ctrl-row">
-        <div class="ctrl-label"><span class="ctrl-name">Ambient</span><span class="ctrl-val" id="valAmb">0.40</span></div>
+        <div class="ctrl-label"><span class="ctrl-name">Dir X</span><span class="ctrl-val" id="valKeyX">-1.00</span></div>
+        <input type="range" id="sldKeyX" min="-2" max="2" step="0.01" value="-1" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Dir Y</span><span class="ctrl-val" id="valKeyY">-2.00</span></div>
+        <input type="range" id="sldKeyY" min="-3" max="3" step="0.01" value="-2" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Dir Z</span><span class="ctrl-val" id="valKeyZ">-1.00</span></div>
+        <input type="range" id="sldKeyZ" min="-2" max="2" step="0.01" value="-1" />
+      </div>
+      <div class="toggle-row"><span class="toggle-name">Specular</span><div class="toggle on" id="tglSpec"></div></div>
+    </div>
+
+    <!-- AMBIENT LIGHT -->
+    <div class="panel-section">
+      <div class="section-label">Ambient Light</div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Intensity</span><span class="ctrl-val" id="valAmb">0.40</span></div>
         <input type="range" id="sldAmb" min="0" max="2" step="0.01" value="0.4" />
       </div>
-      <div class="color-row"><span class="color-name">Ambient Color</span><input type="color" id="colAmb" value="#e6d9ff" /></div>
+      <div class="color-row"><span class="color-name">Sky Color</span><input type="color" id="colAmb" value="#e6d9ff" /></div>
+      <div class="color-row"><span class="color-name">Ground Color</span><input type="color" id="colGround" value="#1a1412" /></div>
+    </div>
+
+    <!-- FILL LIGHT -->
+    <div class="panel-section">
+      <div class="section-label">Fill Light</div>
       <div class="ctrl-row">
-        <div class="ctrl-label"><span class="ctrl-name">Fill Light</span><span class="ctrl-val" id="valFill">0.30</span></div>
+        <div class="ctrl-label"><span class="ctrl-name">Intensity</span><span class="ctrl-val" id="valFill">0.30</span></div>
         <input type="range" id="sldFill" min="0" max="2" step="0.01" value="0.3" />
       </div>
-      <div class="color-row"><span class="color-name">Fill Color</span><input type="color" id="colFill" value="#99b3ff" /></div>
-    </div>
-    <div class="panel-section">
-      <div class="section-label">Post Effects</div>
-      <div class="toggle-row"><span class="toggle-name">Bloom</span><div class="toggle" id="tglBloom"></div></div>
+      <div class="color-row"><span class="color-name">Color</span><input type="color" id="colFill" value="#99b3ff" /></div>
       <div class="ctrl-row">
-        <div class="ctrl-label"><span class="ctrl-name">Bloom Intensity</span><span class="ctrl-val" id="valBloom">0.50</span></div>
+        <div class="ctrl-label"><span class="ctrl-name">Pos X</span><span class="ctrl-val" id="valFillX">2.00</span></div>
+        <input type="range" id="sldFillX" min="-10" max="10" step="0.1" value="2" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Pos Y</span><span class="ctrl-val" id="valFillY">1.00</span></div>
+        <input type="range" id="sldFillY" min="-10" max="10" step="0.1" value="1" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Pos Z</span><span class="ctrl-val" id="valFillZ">2.00</span></div>
+        <input type="range" id="sldFillZ" min="-10" max="10" step="0.1" value="2" />
+      </div>
+    </div>
+
+    <!-- SECOND FILL LIGHT -->
+    <div class="panel-section">
+      <div class="section-label">Fill Light 2</div>
+      <div class="toggle-row"><span class="toggle-name">Enable</span><div class="toggle" id="tglFill2"></div></div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Intensity</span><span class="ctrl-val" id="valFill2">0.20</span></div>
+        <input type="range" id="sldFill2" min="0" max="2" step="0.01" value="0.2" />
+      </div>
+      <div class="color-row"><span class="color-name">Color</span><input type="color" id="colFill2" value="#ffccaa" /></div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Pos X</span><span class="ctrl-val" id="valFill2X">-2.00</span></div>
+        <input type="range" id="sldFill2X" min="-10" max="10" step="0.1" value="-2" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Pos Y</span><span class="ctrl-val" id="valFill2Y">2.00</span></div>
+        <input type="range" id="sldFill2Y" min="-10" max="10" step="0.1" value="2" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Pos Z</span><span class="ctrl-val" id="valFill2Z">-2.00</span></div>
+        <input type="range" id="sldFill2Z" min="-10" max="10" step="0.1" value="-2" />
+      </div>
+    </div>
+
+    <!-- BLOOM -->
+    <div class="panel-section">
+      <div class="section-label">Bloom</div>
+      <div class="toggle-row"><span class="toggle-name">Enable</span><div class="toggle" id="tglBloom"></div></div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Intensity</span><span class="ctrl-val" id="valBloom">0.50</span></div>
         <input type="range" id="sldBloom" min="0" max="2" step="0.01" value="0.5" />
       </div>
-      <div class="toggle-row"><span class="toggle-name">Depth of Field</span><div class="toggle" id="tglDof"></div></div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Threshold</span><span class="ctrl-val" id="valBloomThresh">0.30</span></div>
+        <input type="range" id="sldBloomThresh" min="0" max="1" step="0.01" value="0.3" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Kernel Size</span><span class="ctrl-val" id="valBloomKernel">64</span></div>
+        <input type="range" id="sldBloomKernel" min="16" max="256" step="16" value="64" />
+      </div>
+    </div>
+
+    <!-- DEPTH OF FIELD -->
+    <div class="panel-section">
+      <div class="section-label">Depth of Field</div>
+      <div class="toggle-row"><span class="toggle-name">Enable</span><div class="toggle" id="tglDof"></div></div>
       <div class="ctrl-row">
         <div class="ctrl-label"><span class="ctrl-name">Focus Distance</span><span class="ctrl-val" id="valDof">10.0</span></div>
         <input type="range" id="sldDof" min="1" max="50" step="0.5" value="10" />
       </div>
       <div class="ctrl-row">
-        <div class="ctrl-label"><span class="ctrl-name">DOF Aperture</span><span class="ctrl-val" id="valAp">0.05</span></div>
+        <div class="ctrl-label"><span class="ctrl-name">Aperture (f/stop)</span><span class="ctrl-val" id="valAp">0.05</span></div>
         <input type="range" id="sldAp" min="0.01" max="0.3" step="0.01" value="0.05" />
       </div>
-    </div>
-    <div class="panel-section">
-      <div class="section-label">Material Override</div>
-      <div class="toggle-row"><span class="toggle-name">Override All</span><div class="toggle" id="tglMatOverride"></div></div>
-      <div class="color-row"><span class="color-name">Albedo Color</span><input type="color" id="colAlbedo" value="#ffffff" /></div>
       <div class="ctrl-row">
-        <div class="ctrl-label"><span class="ctrl-name">Metallic</span><span class="ctrl-val" id="valMetal">0.00</span></div>
-        <input type="range" id="sldMetal" min="0" max="1" step="0.01" value="0" />
-      </div>
-      <div class="ctrl-row">
-        <div class="ctrl-label"><span class="ctrl-name">Roughness</span><span class="ctrl-val" id="valRough">0.50</span></div>
-        <input type="range" id="sldRough" min="0" max="1" step="0.01" value="0.5" />
+        <div class="ctrl-label"><span class="ctrl-name">Focal Length</span><span class="ctrl-val" id="valFocal">50</span></div>
+        <input type="range" id="sldFocal" min="10" max="300" step="5" value="50" />
       </div>
     </div>
+
+    <!-- VIGNETTE -->
     <div class="panel-section">
-      <div class="section-label">Display</div>
-      <div class="toggle-row"><span class="toggle-name">Wireframe</span><div class="toggle" id="tglWire"></div></div>
+      <div class="section-label">Vignette</div>
+      <div class="toggle-row"><span class="toggle-name">Enable</span><div class="toggle" id="tglVig"></div></div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Intensity</span><span class="ctrl-val" id="valVig">0.50</span></div>
+        <input type="range" id="sldVig" min="0" max="1" step="0.01" value="0.5" />
+      </div>
+      <div class="color-row"><span class="color-name">Color</span><input type="color" id="colVig" value="#000000" /></div>
+    </div>
+
+    <!-- GRAIN & CHROMATIC -->
+    <div class="panel-section">
+      <div class="section-label">Film & Lens</div>
+      <div class="toggle-row"><span class="toggle-name">Film Grain</span><div class="toggle" id="tglGrain"></div></div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Grain Intensity</span><span class="ctrl-val" id="valGrain">0.20</span></div>
+        <input type="range" id="sldGrain" min="0" max="1" step="0.01" value="0.2" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Chromatic Aber.</span><span class="ctrl-val" id="valChrom">0.00</span></div>
+        <input type="range" id="sldChrom" min="0" max="1" step="0.01" value="0" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Sharpening</span><span class="ctrl-val" id="valSharp">0.00</span></div>
+        <input type="range" id="sldSharp" min="0" max="1" step="0.01" value="0" />
+      </div>
+    </div>
+
+    <!-- CAMERA -->
+    <div class="panel-section">
+      <div class="section-label">Camera</div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Field of View</span><span class="ctrl-val" id="valFov">0.80</span></div>
+        <input type="range" id="sldFov" min="0.2" max="2.5" step="0.01" value="0.8" />
+      </div>
       <div class="toggle-row"><span class="toggle-name">Auto Rotate</span><div class="toggle" id="tglRotate"></div></div>
       <div class="ctrl-row">
         <div class="ctrl-label"><span class="ctrl-name">Rotate Speed</span><span class="ctrl-val" id="valRotSpd">0.005</span></div>
         <input type="range" id="sldRotSpd" min="0.001" max="0.05" step="0.001" value="0.005" />
       </div>
+      <div class="select-row">
+        <span class="select-name">Direction</span>
+        <select id="selRotDir">
+          <option value="1">Clockwise</option>
+          <option value="-1">Counter CW</option>
+        </select>
+      </div>
     </div>
-  </div>
+
+    <!-- DISPLAY -->
+    <div class="panel-section">
+      <div class="section-label">Display</div>
+      <div class="toggle-row"><span class="toggle-name">Wireframe</span><div class="toggle" id="tglWire"></div></div>
+      <div class="toggle-row"><span class="toggle-name">Bounding Box</span><div class="toggle" id="tglBbox"></div></div>
+    </div>
+
+  </div><!-- end panel -->
 
   <div id="statusBar">
     <div id="fileName">Model: <strong id="fileNameText">none loaded</strong></div>
@@ -266,28 +419,50 @@ const MODEL_BASE = 'https://raw.githubusercontent.com/AngelaCashay/AC-3D-Viewer/
 
 const canvas = document.getElementById('renderCanvas');
 const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
-let scene, camera, glowLayer, pipeline, hemiLight, dirLight, fillLight;
-let currentMeshes = [], wireEnabled = false, autoRotate = false, matOverride = false;
+let scene, camera, glowLayer, pipeline, hemiLight, dirLight, fillLight, fillLight2;
+let currentMeshes = [], wireEnabled = false, autoRotate = false, fill2Enabled = false;
 
 function createScene() {
   scene = new BABYLON.Scene(engine);
   scene.clearColor = new BABYLON.Color4(0.031,0.031,0.031,1);
+
   camera = new BABYLON.ArcRotateCamera('cam',-Math.PI/2,Math.PI/3,4,BABYLON.Vector3.Zero(),scene);
   camera.attachControl(canvas,true);
   camera.lowerRadiusLimit=0.1; camera.upperRadiusLimit=50; camera.wheelDeltaPercentage=0.01; camera.minZ=0.01;
+  camera.fov = 0.8;
+
   hemiLight = new BABYLON.HemisphericLight('hemi',new BABYLON.Vector3(0,1,0),scene);
   hemiLight.intensity=0.4; hemiLight.diffuse=new BABYLON.Color3(0.9,0.85,1.0); hemiLight.groundColor=new BABYLON.Color3(0.1,0.08,0.15);
+
   dirLight = new BABYLON.DirectionalLight('dir',new BABYLON.Vector3(-1,-2,-1),scene);
   dirLight.intensity=0.8; dirLight.diffuse=new BABYLON.Color3(1,0.961,0.851);
+
   fillLight = new BABYLON.PointLight('fill',new BABYLON.Vector3(2,1,2),scene);
   fillLight.intensity=0.3; fillLight.diffuse=new BABYLON.Color3(0.6,0.7,1.0);
+
+  fillLight2 = new BABYLON.PointLight('fill2',new BABYLON.Vector3(-2,2,-2),scene);
+  fillLight2.intensity=0; fillLight2.diffuse=new BABYLON.Color3(1,0.8,0.67);
+
   glowLayer = new BABYLON.GlowLayer('glow',scene);
   glowLayer.intensity=0.6; glowLayer.blurKernelSize=32;
+
   pipeline = new BABYLON.DefaultRenderingPipeline('pipe',true,scene,[camera]);
-  pipeline.bloomEnabled=false; pipeline.bloomIntensity=0.5; pipeline.bloomThreshold=0.3;
+  pipeline.bloomEnabled=false; pipeline.bloomIntensity=0.5; pipeline.bloomThreshold=0.3; pipeline.bloomKernel=64;
   pipeline.depthOfFieldEnabled=false; pipeline.depthOfField.focusDistance=10000; pipeline.depthOfField.fStop=0.05; pipeline.depthOfField.focalLength=50;
+  pipeline.chromaticAberrationEnabled=false; pipeline.chromaticAberration.aberrationAmount=0;
+  pipeline.grainEnabled=false; pipeline.grain.intensity=0.2; pipeline.grain.animated=true;
+  pipeline.vignetteEnabled=false; pipeline.vignette.vignetteWeight=0.5;
+  pipeline.sharpenEnabled=false; pipeline.sharpen.edgeAmount=0;
+  pipeline.imageProcessing.contrast=1; pipeline.imageProcessing.exposure=1;
+
   scene.createDefaultEnvironment({createGround:false,createSkybox:false});
-  scene.registerBeforeRender(()=>{ if(autoRotate) camera.alpha+=parseFloat(document.getElementById('sldRotSpd').value); });
+
+  scene.registerBeforeRender(()=>{
+    if(autoRotate) {
+      const dir = parseFloat(document.getElementById('selRotDir').value);
+      camera.alpha += parseFloat(document.getElementById('sldRotSpd').value) * dir;
+    }
+  });
 }
 
 function loadModel(file) {
@@ -298,7 +473,6 @@ function loadModel(file) {
     currentMeshes=meshes;
     frameCamera();
     applyWireframe();
-    if(matOverride) applyMatOverride();
     document.getElementById('loader').classList.remove('visible');
     document.getElementById('dropZone').classList.add('hidden');
     document.getElementById('fileNameText').textContent=file.name;
@@ -317,30 +491,9 @@ function frameCamera() {
 function hexToColor3(hex) {
   return new BABYLON.Color3(parseInt(hex.slice(1,3),16)/255,parseInt(hex.slice(3,5),16)/255,parseInt(hex.slice(5,7),16)/255);
 }
-function applyWireframe() { currentMeshes.forEach(m=>{if(m.material) m.material.wireframe=wireEnabled;}); }
-function applyMatOverride() {
-  if(!matOverride) {
-    currentMeshes.forEach(m=>{ try{ if(m._origMat){m.material=m._origMat;delete m._origMat;} }catch(e){} });
-    return;
-  }
-  const color=hexToColor3(document.getElementById('colAlbedo').value);
-  const metal=parseFloat(document.getElementById('sldMetal').value);
-  const rough=parseFloat(document.getElementById('sldRough').value);
-  // Process one at a time to avoid freezing on Feather stroke geometry
-  let i=0;
-  function next() {
-    if(i>=currentMeshes.length) return;
-    const m=currentMeshes[i++];
-    try {
-      if(!m||!m.material||m.isDisposed()){next();return;}
-      if(!m._origMat) m._origMat=m.material;
-      // Update existing material values directly — never replace with new PBRMaterial
-      if(m.material.albedoColor!==undefined){ m.material.albedoColor=color; m.material.metallic=metal; m.material.roughness=rough; }
-      else if(m.material.diffuseColor!==undefined){ m.material.diffuseColor=color; }
-    } catch(e){}
-    setTimeout(next,0);
-  }
-  next();
+
+function applyWireframe() {
+  currentMeshes.forEach(m=>{if(m.material) m.material.wireframe=wireEnabled;});
 }
 
 function bindSlider(sid,vid,dec,fn) {
@@ -349,12 +502,12 @@ function bindSlider(sid,vid,dec,fn) {
 }
 
 const PRESETS = {
-  faith:  {bg:'#080808',glowOn:true, glowInt:0.6, glowBlur:32, glowCol:'#c9a96e',keyInt:0.8,keyCol:'#fff4d9',ambInt:0.4,ambCol:'#e6d9ff',fillInt:0.3,fillCol:'#99b3ff',bloom:false,bloomInt:0.5,dof:false,exp:1.0},
-  studio: {bg:'#111111',glowOn:false,glowInt:0.1, glowBlur:16, glowCol:'#ffffff',keyInt:1.2,keyCol:'#ffffff',ambInt:0.6,ambCol:'#ffffff',fillInt:0.5,fillCol:'#e0e8ff',bloom:false,bloomInt:0.3,dof:false,exp:1.2},
-  neon:   {bg:'#04010f',glowOn:true, glowInt:1.2, glowBlur:64, glowCol:'#a259ff',keyInt:0.5,keyCol:'#ff66cc',ambInt:0.2,ambCol:'#330066',fillInt:0.6,fillCol:'#00ffcc',bloom:true, bloomInt:1.2,dof:false,exp:0.9},
-  soft:   {bg:'#0a0a12',glowOn:true, glowInt:0.35,glowBlur:48, glowCol:'#d4b8ff',keyInt:0.6,keyCol:'#ffeedd',ambInt:0.7,ambCol:'#c8d4ff',fillInt:0.4,fillCol:'#ffd4e8',bloom:true, bloomInt:0.6,dof:true, exp:1.1},
-  sketch: {bg:'#f5f0e8',glowOn:false,glowInt:0,   glowBlur:16, glowCol:'#000000',keyInt:1.0,keyCol:'#ffffff',ambInt:0.5,ambCol:'#eeeeee',fillInt:0.2,fillCol:'#cccccc',bloom:false,bloomInt:0,  dof:false,exp:1.3},
-  void:   {bg:'#000000',glowOn:true, glowInt:0.9, glowBlur:96, glowCol:'#00aaff',keyInt:0.3,keyCol:'#001133',ambInt:0.1,ambCol:'#000033',fillInt:0.8,fillCol:'#0055ff',bloom:true, bloomInt:1.5,dof:true, exp:0.8}
+  faith:  {bg:'#080808',glowOn:true, glowInt:0.6, glowBlur:32, glowCol:'#c9a96e',keyInt:0.8,keyCol:'#fff4d9',ambInt:0.4,ambCol:'#e6d9ff',fillInt:0.3,fillCol:'#99b3ff',bloom:false,bloomInt:0.5,dof:false,exp:1.0,contrast:1.0,sat:1.0},
+  studio: {bg:'#111111',glowOn:false,glowInt:0.1, glowBlur:16, glowCol:'#ffffff',keyInt:1.2,keyCol:'#ffffff',ambInt:0.6,ambCol:'#ffffff',fillInt:0.5,fillCol:'#e0e8ff',bloom:false,bloomInt:0.3,dof:false,exp:1.2,contrast:1.1,sat:0.9},
+  neon:   {bg:'#04010f',glowOn:true, glowInt:1.2, glowBlur:64, glowCol:'#a259ff',keyInt:0.5,keyCol:'#ff66cc',ambInt:0.2,ambCol:'#330066',fillInt:0.6,fillCol:'#00ffcc',bloom:true, bloomInt:1.2,dof:false,exp:0.9,contrast:1.2,sat:1.4},
+  soft:   {bg:'#0a0a12',glowOn:true, glowInt:0.35,glowBlur:48, glowCol:'#d4b8ff',keyInt:0.6,keyCol:'#ffeedd',ambInt:0.7,ambCol:'#c8d4ff',fillInt:0.4,fillCol:'#ffd4e8',bloom:true, bloomInt:0.6,dof:true, exp:1.1,contrast:0.9,sat:1.1},
+  sketch: {bg:'#f5f0e8',glowOn:false,glowInt:0,   glowBlur:16, glowCol:'#000000',keyInt:1.0,keyCol:'#ffffff',ambInt:0.5,ambCol:'#eeeeee',fillInt:0.2,fillCol:'#cccccc',bloom:false,bloomInt:0,  dof:false,exp:1.3,contrast:1.0,sat:0.0},
+  void:   {bg:'#000000',glowOn:true, glowInt:0.9, glowBlur:96, glowCol:'#00aaff',keyInt:0.3,keyCol:'#001133',ambInt:0.1,ambCol:'#000033',fillInt:0.8,fillCol:'#0055ff',bloom:true, bloomInt:1.5,dof:true, exp:0.8,contrast:1.3,sat:1.2}
 };
 
 function applyPreset(name) {
@@ -371,8 +524,9 @@ function applyPreset(name) {
   document.getElementById('sldAmb').value=p.ambInt; document.getElementById('valAmb').textContent=p.ambInt.toFixed(2); document.getElementById('colAmb').value=p.ambCol;
   fillLight.intensity=p.fillInt; fillLight.diffuse=hexToColor3(p.fillCol);
   document.getElementById('sldFill').value=p.fillInt; document.getElementById('valFill').textContent=p.fillInt.toFixed(2); document.getElementById('colFill').value=p.fillCol;
-  scene.imageProcessingConfiguration.exposure=p.exp;
-  document.getElementById('sldExp').value=p.exp; document.getElementById('valExp').textContent=p.exp.toFixed(2);
+  pipeline.imageProcessingConfiguration.exposure=p.exp; document.getElementById('sldExp').value=p.exp; document.getElementById('valExp').textContent=p.exp.toFixed(2);
+  pipeline.imageProcessingConfiguration.contrast=p.contrast; document.getElementById('sldContrast').value=p.contrast; document.getElementById('valContrast').textContent=p.contrast.toFixed(2);
+  pipeline.imageProcessing.colorCurvesEnabled=false;
   pipeline.bloomEnabled=p.bloom; pipeline.bloomIntensity=p.bloomInt;
   const bt=document.getElementById('tglBloom'); p.bloom?bt.classList.add('on'):bt.classList.remove('on');
   document.getElementById('sldBloom').value=p.bloomInt; document.getElementById('valBloom').textContent=p.bloomInt.toFixed(2);
@@ -390,20 +544,49 @@ function gatherSettings() {
     glowCol: document.getElementById('colGlow').value.replace('#',''),
     bg: document.getElementById('colBg').value.replace('#',''),
     exp: document.getElementById('sldExp').value,
+    contrast: document.getElementById('sldContrast').value,
+    sat: document.getElementById('sldSat').value,
+    tone: document.getElementById('selTone').value,
     keyInt: document.getElementById('sldKey').value,
     keyCol: document.getElementById('colKey').value.replace('#',''),
+    keyX: document.getElementById('sldKeyX').value,
+    keyY: document.getElementById('sldKeyY').value,
+    keyZ: document.getElementById('sldKeyZ').value,
+    spec: document.getElementById('tglSpec').classList.contains('on')?1:0,
     ambInt: document.getElementById('sldAmb').value,
     ambCol: document.getElementById('colAmb').value.replace('#',''),
+    groundCol: document.getElementById('colGround').value.replace('#',''),
     fillInt: document.getElementById('sldFill').value,
     fillCol: document.getElementById('colFill').value.replace('#',''),
+    fillX: document.getElementById('sldFillX').value,
+    fillY: document.getElementById('sldFillY').value,
+    fillZ: document.getElementById('sldFillZ').value,
+    fill2On: document.getElementById('tglFill2').classList.contains('on')?1:0,
+    fill2Int: document.getElementById('sldFill2').value,
+    fill2Col: document.getElementById('colFill2').value.replace('#',''),
+    fill2X: document.getElementById('sldFill2X').value,
+    fill2Y: document.getElementById('sldFill2Y').value,
+    fill2Z: document.getElementById('sldFill2Z').value,
     bloom: document.getElementById('tglBloom').classList.contains('on')?1:0,
     bloomInt: document.getElementById('sldBloom').value,
+    bloomThresh: document.getElementById('sldBloomThresh').value,
+    bloomKernel: document.getElementById('sldBloomKernel').value,
     dof: document.getElementById('tglDof').classList.contains('on')?1:0,
     dofDist: document.getElementById('sldDof').value,
     dofAp: document.getElementById('sldAp').value,
-    wire: document.getElementById('tglWire').classList.contains('on')?1:0,
+    dofFocal: document.getElementById('sldFocal').value,
+    vig: document.getElementById('tglVig').classList.contains('on')?1:0,
+    vigInt: document.getElementById('sldVig').value,
+    vigCol: document.getElementById('colVig').value.replace('#',''),
+    grain: document.getElementById('tglGrain').classList.contains('on')?1:0,
+    grainInt: document.getElementById('sldGrain').value,
+    chrom: document.getElementById('sldChrom').value,
+    sharp: document.getElementById('sldSharp').value,
+    fov: document.getElementById('sldFov').value,
     rotate: document.getElementById('tglRotate').classList.contains('on')?1:0,
     rotSpd: document.getElementById('sldRotSpd').value,
+    rotDir: document.getElementById('selRotDir').value,
+    wire: document.getElementById('tglWire').classList.contains('on')?1:0,
     camAlpha: camera.alpha.toFixed(4),
     camBeta: camera.beta.toFixed(4),
     camRadius: camera.radius.toFixed(4),
@@ -426,8 +609,10 @@ function showToast(msg) {
 }
 
 function bindControls() {
-  document.getElementById('btnReset').addEventListener('click', frameCamera);
+  document.getElementById('btnReset').addEventListener('click',frameCamera);
   document.getElementById('btnLoad').addEventListener('click',()=>document.getElementById('fileInput').click());
+  document.getElementById('btnShare').addEventListener('click',copyShareLink);
+
   document.getElementById('btnWire').addEventListener('click',()=>{
     wireEnabled=!wireEnabled;
     document.getElementById('btnWire').classList.toggle('on',wireEnabled);
@@ -445,52 +630,145 @@ function bindControls() {
     document.getElementById('btnInspector').classList.toggle('on',inspectorOpen);
     inspectorOpen?scene.debugLayer.show({embedMode:false,overlay:true}):scene.debugLayer.hide();
   });
-  document.getElementById('btnShare').addEventListener('click',copyShareLink);
+
   document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0]) loadModel(e.target.files[0]);});
   document.getElementById('dropBtn').addEventListener('click',()=>document.getElementById('fileInput').click());
   const wrap=document.getElementById('canvasWrap');
   wrap.addEventListener('dragover',e=>{e.preventDefault();wrap.classList.add('drag-over');});
   wrap.addEventListener('dragleave',e=>{if(!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over');});
   wrap.addEventListener('drop',e=>{e.preventDefault();wrap.classList.remove('drag-over');if(e.dataTransfer.files[0]) loadModel(e.dataTransfer.files[0]);});
+
   document.querySelectorAll('.preset-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active'); applyPreset(btn.dataset.preset);
     });
   });
+
+  // Glow
   const tglGlow=document.getElementById('tglGlow');
   tglGlow.addEventListener('click',()=>{ tglGlow.classList.toggle('on'); glowLayer.intensity=tglGlow.classList.contains('on')?parseFloat(document.getElementById('sldGlowInt').value):0; });
   bindSlider('sldGlowInt','valGlowInt',2,v=>{if(document.getElementById('tglGlow').classList.contains('on')) glowLayer.intensity=v;});
   bindSlider('sldGlowBlur','valGlowBlur',0,v=>{glowLayer.blurKernelSize=v;});
   document.getElementById('colGlow').addEventListener('input',e=>{
     const col=hexToColor3(e.target.value);
-    currentMeshes.forEach(m=>{if(m.material&&m.material.emissiveColor!==undefined) m.material.emissiveColor=col.scale(0.15);});
+    currentMeshes.forEach(m=>{try{if(m.material&&m.material.emissiveColor!==undefined) m.material.emissiveColor=col.scale(0.15);}catch(e){}});
   });
+
+  // Background
   document.getElementById('colBg').addEventListener('input',e=>{const c=hexToColor3(e.target.value);scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1);});
-  bindSlider('sldExp','valExp',2,v=>{scene.imageProcessingConfiguration.exposure=v;});
+  bindSlider('sldExp','valExp',2,v=>{pipeline.imageProcessingConfiguration.exposure=v;});
+  bindSlider('sldContrast','valContrast',2,v=>{pipeline.imageProcessingConfiguration.contrast=v;});
+  bindSlider('sldSat','valSat',2,v=>{
+    pipeline.imageProcessing.colorCurvesEnabled=true;
+    if(!pipeline.imageProcessing.colorCurves) pipeline.imageProcessing.colorCurves=new BABYLON.ColorCurves();
+    pipeline.imageProcessing.colorCurves.globalSaturation=v*100-100;
+  });
+  document.getElementById('selTone').addEventListener('change',e=>{
+    const v=parseInt(e.target.value);
+    pipeline.imageProcessingConfiguration.toneMappingEnabled=v!==3;
+    if(v===0) pipeline.imageProcessingConfiguration.toneMappingType=BABYLON.ImageProcessingConfiguration.TONEMAPPING_STANDARD;
+    else if(v===1) pipeline.imageProcessingConfiguration.toneMappingType=BABYLON.ImageProcessingConfiguration.TONEMAPPING_ACES;
+    else if(v===2) pipeline.imageProcessingConfiguration.toneMappingType=3;
+  });
+
+  // Key light
   bindSlider('sldKey','valKey',2,v=>{dirLight.intensity=v;});
   document.getElementById('colKey').addEventListener('input',e=>{dirLight.diffuse=hexToColor3(e.target.value);});
+  bindSlider('sldKeyX','valKeyX',2,v=>{dirLight.direction=new BABYLON.Vector3(v,parseFloat(document.getElementById('sldKeyY').value),parseFloat(document.getElementById('sldKeyZ').value));});
+  bindSlider('sldKeyY','valKeyY',2,v=>{dirLight.direction=new BABYLON.Vector3(parseFloat(document.getElementById('sldKeyX').value),v,parseFloat(document.getElementById('sldKeyZ').value));});
+  bindSlider('sldKeyZ','valKeyZ',2,v=>{dirLight.direction=new BABYLON.Vector3(parseFloat(document.getElementById('sldKeyX').value),parseFloat(document.getElementById('sldKeyY').value),v);});
+  const tglSpec=document.getElementById('tglSpec');
+  tglSpec.classList.add('on');
+  tglSpec.addEventListener('click',()=>{ tglSpec.classList.toggle('on'); dirLight.specular=tglSpec.classList.contains('on')?new BABYLON.Color3(1,1,1):new BABYLON.Color3(0,0,0); });
+
+  // Ambient
   bindSlider('sldAmb','valAmb',2,v=>{hemiLight.intensity=v;});
   document.getElementById('colAmb').addEventListener('input',e=>{hemiLight.diffuse=hexToColor3(e.target.value);});
+  document.getElementById('colGround').addEventListener('input',e=>{hemiLight.groundColor=hexToColor3(e.target.value);});
+
+  // Fill light
   bindSlider('sldFill','valFill',2,v=>{fillLight.intensity=v;});
   document.getElementById('colFill').addEventListener('input',e=>{fillLight.diffuse=hexToColor3(e.target.value);});
+  bindSlider('sldFillX','valFillX',2,v=>{fillLight.position.x=v;});
+  bindSlider('sldFillY','valFillY',2,v=>{fillLight.position.y=v;});
+  bindSlider('sldFillZ','valFillZ',2,v=>{fillLight.position.z=v;});
+
+  // Fill light 2
+  const tglFill2=document.getElementById('tglFill2');
+  tglFill2.addEventListener('click',()=>{
+    tglFill2.classList.toggle('on'); fill2Enabled=tglFill2.classList.contains('on');
+    fillLight2.intensity=fill2Enabled?parseFloat(document.getElementById('sldFill2').value):0;
+  });
+  bindSlider('sldFill2','valFill2',2,v=>{if(fill2Enabled) fillLight2.intensity=v;});
+  document.getElementById('colFill2').addEventListener('input',e=>{fillLight2.diffuse=hexToColor3(e.target.value);});
+  bindSlider('sldFill2X','valFill2X',2,v=>{fillLight2.position.x=v;});
+  bindSlider('sldFill2Y','valFill2Y',2,v=>{fillLight2.position.y=v;});
+  bindSlider('sldFill2Z','valFill2Z',2,v=>{fillLight2.position.z=v;});
+
+  // Bloom
   const tglBloom=document.getElementById('tglBloom');
   tglBloom.addEventListener('click',()=>{tglBloom.classList.toggle('on');pipeline.bloomEnabled=tglBloom.classList.contains('on');});
   bindSlider('sldBloom','valBloom',2,v=>{pipeline.bloomIntensity=v;});
+  bindSlider('sldBloomThresh','valBloomThresh',2,v=>{pipeline.bloomThreshold=v;});
+  bindSlider('sldBloomKernel','valBloomKernel',0,v=>{pipeline.bloomKernel=v;});
+
+  // DOF
   const tglDof=document.getElementById('tglDof');
   tglDof.addEventListener('click',()=>{tglDof.classList.toggle('on');pipeline.depthOfFieldEnabled=tglDof.classList.contains('on');});
   bindSlider('sldDof','valDof',1,v=>{pipeline.depthOfField.focusDistance=v*1000;});
   bindSlider('sldAp','valAp',2,v=>{pipeline.depthOfField.fStop=v;});
-  const tglMat=document.getElementById('tglMatOverride');
-  tglMat.addEventListener('click',()=>{tglMat.classList.toggle('on');matOverride=tglMat.classList.contains('on');applyMatOverride();});
-  document.getElementById('colAlbedo').addEventListener('input',()=>{if(matOverride) applyMatOverride();});
-  bindSlider('sldMetal','valMetal',2,()=>{if(matOverride) applyMatOverride();});
-  bindSlider('sldRough','valRough',2,()=>{if(matOverride) applyMatOverride();});
-  const tglWire=document.getElementById('tglWire');
-  tglWire.addEventListener('click',()=>{tglWire.classList.toggle('on');wireEnabled=tglWire.classList.contains('on');document.getElementById('btnWire').classList.toggle('on',wireEnabled);applyWireframe();});
+  bindSlider('sldFocal','valFocal',0,v=>{pipeline.depthOfField.focalLength=v;});
+
+  // Vignette
+  const tglVig=document.getElementById('tglVig');
+  tglVig.addEventListener('click',()=>{tglVig.classList.toggle('on');pipeline.vignetteEnabled=tglVig.classList.contains('on');});
+  bindSlider('sldVig','valVig',2,v=>{pipeline.vignette.vignetteWeight=v*4;});
+  document.getElementById('colVig').addEventListener('input',e=>{
+    const c=hexToColor3(e.target.value);
+    pipeline.vignette.vignetteColor=new BABYLON.Color4(c.r,c.g,c.b,1);
+  });
+
+  // Grain
+  const tglGrain=document.getElementById('tglGrain');
+  tglGrain.addEventListener('click',()=>{tglGrain.classList.toggle('on');pipeline.grainEnabled=tglGrain.classList.contains('on');});
+  bindSlider('sldGrain','valGrain',2,v=>{pipeline.grain.intensity=v*50;});
+
+  // Chromatic
+  bindSlider('sldChrom','valChrom',2,v=>{
+    pipeline.chromaticAberrationEnabled=v>0;
+    pipeline.chromaticAberration.aberrationAmount=v*10;
+  });
+
+  // Sharpening
+  bindSlider('sldSharp','valSharp',2,v=>{
+    pipeline.sharpenEnabled=v>0;
+    pipeline.sharpen.edgeAmount=v;
+  });
+
+  // Camera FOV
+  bindSlider('sldFov','valFov',2,v=>{camera.fov=v;});
+
+  // Auto rotate
   const tglRot=document.getElementById('tglRotate');
   tglRot.addEventListener('click',()=>{tglRot.classList.toggle('on');autoRotate=tglRot.classList.contains('on');});
   bindSlider('sldRotSpd','valRotSpd',3,()=>{});
+
+  // Wireframe panel
+  const tglWire=document.getElementById('tglWire');
+  tglWire.addEventListener('click',()=>{
+    tglWire.classList.toggle('on'); wireEnabled=tglWire.classList.contains('on');
+    document.getElementById('btnWire').classList.toggle('on',wireEnabled);
+    applyWireframe();
+  });
+
+  // Bounding box
+  const tglBbox=document.getElementById('tglBbox');
+  tglBbox.addEventListener('click',()=>{
+    tglBbox.classList.toggle('on');
+    const on=tglBbox.classList.contains('on');
+    currentMeshes.forEach(m=>{try{m.showBoundingBox=on;}catch(e){}});
+  });
 }
 
 createScene();
