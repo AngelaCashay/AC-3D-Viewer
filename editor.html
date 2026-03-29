@@ -319,16 +319,28 @@ function hexToColor3(hex) {
 }
 function applyWireframe() { currentMeshes.forEach(m=>{if(m.material) m.material.wireframe=wireEnabled;}); }
 function applyMatOverride() {
-  if(!matOverride){ currentMeshes.forEach(m=>{if(m._origMat){m.material=m._origMat;delete m._origMat;}}); return; }
+  if(!matOverride) {
+    currentMeshes.forEach(m=>{ try{ if(m._origMat){m.material=m._origMat;delete m._origMat;} }catch(e){} });
+    return;
+  }
   const color=hexToColor3(document.getElementById('colAlbedo').value);
   const metal=parseFloat(document.getElementById('sldMetal').value);
   const rough=parseFloat(document.getElementById('sldRough').value);
-  currentMeshes.forEach(m=>{
-    if(!m.material) return;
-    if(!m._origMat) m._origMat=m.material;
-    const mat=new BABYLON.PBRMaterial('ov_'+m.name,scene);
-    mat.albedoColor=color; mat.metallic=metal; mat.roughness=rough; mat.wireframe=wireEnabled; m.material=mat;
-  });
+  // Process one at a time to avoid freezing on Feather stroke geometry
+  let i=0;
+  function next() {
+    if(i>=currentMeshes.length) return;
+    const m=currentMeshes[i++];
+    try {
+      if(!m||!m.material||m.isDisposed()){next();return;}
+      if(!m._origMat) m._origMat=m.material;
+      // Update existing material values directly — never replace with new PBRMaterial
+      if(m.material.albedoColor!==undefined){ m.material.albedoColor=color; m.material.metallic=metal; m.material.roughness=rough; }
+      else if(m.material.diffuseColor!==undefined){ m.material.diffuseColor=color; }
+    } catch(e){}
+    setTimeout(next,0);
+  }
+  next();
 }
 
 function bindSlider(sid,vid,dec,fn) {
