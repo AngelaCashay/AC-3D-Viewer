@@ -169,10 +169,17 @@ function restoreCreatorView() {
   camera.radius=savedCam.radius; camera.target=savedCam.target.clone();
 }
 
-function loadModelFromURL(filename) {
+function loadModelFromURL(filename, params) {
   const url = MODEL_BASE + encodeURIComponent(filename);
   BABYLON.SceneLoader.ImportMesh('','',url,scene,(meshes)=>{
     if(!meshes.length){ showNoParams(); return; }
+
+    // Apply settings AFTER model is loaded so everything renders correctly
+    applySettings(params);
+
+    // Apply camera AFTER model loads
+    applyCameraFromParams(params);
+
     document.getElementById('loader').classList.add('hidden');
   },null,(sc,msg)=>{
     console.error('Load error:',msg);
@@ -194,14 +201,14 @@ function init() {
   }
 
   createScene();
-  applySettings(params);
 
   const modelName = params.get('model');
   if(modelName && modelName !== 'none loaded') {
-    loadModelFromURL(modelName);
-    // Apply camera after short delay to let model load
-    setTimeout(()=>applyCameraFromParams(params), 2000);
+    // Settings + camera applied inside callback after model loads
+    loadModelFromURL(modelName, params);
   } else {
+    // No model — still apply visual settings
+    applySettings(params);
     document.getElementById('loader').classList.add('hidden');
     showNoParams();
   }
