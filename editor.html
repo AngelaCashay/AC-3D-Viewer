@@ -485,17 +485,20 @@ function createScene() {
 }
 
 function loadFiles(files) {
-  // Register ALL files in Babylon's virtual filesystem first
   BABYLON.FilesInput.FilesToLoad = BABYLON.FilesInput.FilesToLoad || {};
   let objFile = null;
+  let glbFile = null;
   for(let i=0; i<files.length; i++) {
     const f = files[i];
-    BABYLON.FilesInput.FilesToLoad[f.name.toLowerCase()] = f;
-    if(f.name.toLowerCase().endsWith('.obj')) objFile = f;
-    if(f.name.toLowerCase().endsWith('.glb') || f.name.toLowerCase().endsWith('.gltf')) objFile = f;
+    const name = f.name.toLowerCase();
+    BABYLON.FilesInput.FilesToLoad[name] = f;
+    if(name.endsWith('.obj')) objFile = f;
+    if(name.endsWith('.glb') || name.endsWith('.gltf')) glbFile = f;
   }
-  if(!objFile && files.length > 0) objFile = files[0];
-  if(objFile) loadModel(objFile);
+  // Priority: GLB > OBJ — never load MTL directly
+  const toLoad = glbFile || objFile;
+  if(toLoad) loadModel(toLoad);
+  else alert('Please include an OBJ or GLB file.');
 }
 
 function loadModel(file) {
