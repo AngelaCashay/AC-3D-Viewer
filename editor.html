@@ -145,7 +145,6 @@
       transition: opacity 0.3s ease; white-space: nowrap;
     }
     #toast.show { opacity: 1; }
-    #fileInput { position: absolute; left: -9999px; top: -9999px; opacity: 0; width: 1px; height: 1px; }
   </style>
 </head>
 <body>
@@ -168,6 +167,7 @@
       <div class="drop-ring"><div class="drop-icon">✦</div></div>
       <div class="drop-title">Drop your GLB here</div>
       <div class="drop-sub">glb · gltf · obj · stl</div>
+      <input type="file" id="fileInput" accept=".glb,.gltf,.obj,.stl" style="display:none" />
       <label for="fileInput" class="drop-btn" id="dropBtn">Choose File</label>
     </div>
     <div id="loader"><div class="loader-ring"></div><div class="loader-text">Loading model…</div></div>
@@ -425,7 +425,6 @@
   </div>
 </div>
 
-<input type="file" id="fileInput" accept=".glb,.gltf,.obj,.stl,.babylon" />
 <div id="toast"></div>
 
 <script>
