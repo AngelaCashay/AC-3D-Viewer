@@ -462,10 +462,11 @@ function createScene() {
 
   pipeline = new BABYLON.DefaultRenderingPipeline('pipe',true,scene,[camera]);
   pipeline.bloomEnabled=false; pipeline.bloomIntensity=0.5; pipeline.bloomThreshold=0.3; pipeline.bloomKernel=64;
-  pipeline.depthOfFieldEnabled=false; pipeline.depthOfField.focusDistance=10000; pipeline.depthOfField.fStop=0.05; pipeline.depthOfField.focalLength=50;
-  pipeline.chromaticAberrationEnabled=false; pipeline.chromaticAberration.aberrationAmount=0;
-  pipeline.grainEnabled=false; pipeline.grain.intensity=10; pipeline.grain.animated=true;
-  pipeline.sharpenEnabled=false; pipeline.sharpen.edgeAmount=0;
+  pipeline.depthOfFieldEnabled=false;
+  try { pipeline.depthOfField.focusDistance=10000; pipeline.depthOfField.fStop=0.05; pipeline.depthOfField.focalLength=50; } catch(e){}
+  pipeline.chromaticAberrationEnabled=true; pipeline.chromaticAberration.aberrationAmount=0; pipeline.chromaticAberrationEnabled=false;
+  pipeline.grainEnabled=true; pipeline.grain.intensity=10; pipeline.grain.animated=true; pipeline.grainEnabled=false;
+  pipeline.sharpenEnabled=true; pipeline.sharpen.edgeAmount=0; pipeline.sharpenEnabled=false;
   pipeline.imageProcessingEnabled=true;
   pipeline.imageProcessing.contrast=1;
   pipeline.imageProcessing.exposure=1;
