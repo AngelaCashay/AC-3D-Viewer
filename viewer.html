@@ -51,9 +51,11 @@ function createScene(p) {
   const c=h2c(bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1);
 
   // Build camera with saved position from the start — never auto-frame
-  const alpha=parseFloat(p.get('ca')||(-Math.PI/2));
-  const beta=parseFloat(p.get('cb')||(Math.PI/3));
-  const radius=parseFloat(p.get('cr')||4);
+  const rawAlpha=parseFloat(p.get('camAlpha')||(-Math.PI/2));
+  // Normalize alpha to -PI..PI range so large values from multiple rotations display correctly
+  const alpha = rawAlpha % (2*Math.PI);
+  const beta=parseFloat(p.get('camBeta')||(Math.PI/3));
+  const radius=parseFloat(p.get('camRadius')||4);
   const tx=parseFloat(p.get('camTX')||0);
   const ty=parseFloat(p.get('camTY')||0);
   const tz=parseFloat(p.get('camTZ')||0);
@@ -64,7 +66,7 @@ function createScene(p) {
 
   // Save creator view
   savedCam={alpha,beta,radius,target:new BABYLON.Vector3(tx,ty,tz)};
-  if(p.has('ca')) G('bCV').classList.add('v');
+  if(p.has('camAlpha')) G('bCV').classList.add('v');
 
   hemi=new BABYLON.HemisphericLight('h',new BABYLON.Vector3(0,1,0),scene);
   hemi.intensity=parseFloat(p.get('ambInt')||0.4);
@@ -85,7 +87,7 @@ function createScene(p) {
   fill2.diffuse=h2c('#'+(p.get('fill2Col')||'ffccaa'));
 
   glow=new BABYLON.GlowLayer('g',scene);
-  const gOn=p.get('glowOn')!=='0';
+  const gOn=p.get('glowOn')==='1';
   glow.intensity=gOn?parseFloat(p.get('glowInt')||0.6):0;
   glow.blurKernelSize=parseFloat(p.get('glowBlur')||32);
 
