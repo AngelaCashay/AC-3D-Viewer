@@ -483,37 +483,54 @@ function loadModel(file) {
   document.getElementById('loader').classList.add('visible');
   currentMeshes.forEach(m=>{try{m.dispose();}catch(e){}});
   currentMeshes=[];
-  const ext = file.name.split('.').pop().toLowerCase();
-  const blobUrl = URL.createObjectURL(file);
-  // Use a fake filename with correct extension so Babylon picks the right loader
-  const fakeUrl = blobUrl + '#' + file.name;
-  BABYLON.SceneLoader.ImportMesh('', '', blobUrl, scene, (meshes)=>{
-    currentMeshes=meshes;
-    frameCamera();
-    applyWireframe();
-    document.getElementById('loader').classList.remove('visible');
-    document.getElementById('dropZone').classList.add('hidden');
-    document.getElementById('fileNameText').textContent=file.name;
-    URL.revokeObjectURL(blobUrl);
-  }, null, (sc,msg)=>{
-    document.getElementById('loader').classList.remove('visible');
-    URL.revokeObjectURL(blobUrl);
-    // Try with explicit plugin
-    const blobUrl2 = URL.createObjectURL(file);
-    BABYLON.SceneLoader.ImportMesh('', '', blobUrl2, scene, (meshes)=>{
-      currentMeshes=meshes;
-      frameCamera();
-      applyWireframe();
-      document.getElementById('loader').classList.remove('visible');
-      document.getElementById('dropZone').classList.add('hidden');
-      document.getElementById('fileNameText').textContent=file.name;
-      URL.revokeObjectURL(blobUrl2);
-    }, null, (sc2, msg2)=>{
-      document.getElementById('loader').classList.remove('visible');
-      URL.revokeObjectURL(blobUrl2);
-      alert('Could not load: ' + msg2 + '\nTry renaming the file to remove spaces.');
-    }, '.'+ext);
-  }, '.'+ext);
+
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    const data = e.target.result;
+    // Create a named blob so Babylon sees the extension
+    const namedBlob = new Blob([data]);
+    const blobUrl = URL.createObjectURL(namedBlob);
+    // Append extension as a query hint via BABYLON's file tools
+    BABYLON.SceneLoader.ImportMesh(
+      '', blobUrl, '', scene,
+      (meshes) => {
+        currentMeshes = meshes;
+        frameCamera();
+        applyWireframe();
+        document.getElementById('loader').classList.remove('visible');
+        document.getElementById('dropZone').classList.add('hidden');
+        document.getElementById('fileNameText').textContent = file.name;
+        URL.revokeObjectURL(blobUrl);
+      },
+      null,
+      (sc, msg) => {
+        URL.revokeObjectURL(blobUrl);
+        // Second attempt: register file in Babylon's file system
+        BABYLON.FilesInput.FilesToLoad = {};
+        BABYLON.FilesInput.FilesToLoad[file.name.toLowerCase()] = file;
+        BABYLON.SceneLoader.ImportMesh(
+          '', 'file:', file.name, scene,
+          (meshes) => {
+            currentMeshes = meshes;
+            frameCamera();
+            applyWireframe();
+            document.getElementById('loader').classList.remove('visible');
+            document.getElementById('dropZone').classList.add('hidden');
+            document.getElementById('fileNameText').textContent = file.name;
+          },
+          null,
+          (sc2, msg2) => {
+            document.getElementById('loader').classList.remove('visible');
+            alert('Could not load file. Error: ' + msg2);
+          }
+        );
+      },
+      ext
+    );
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 function frameCamera() {
