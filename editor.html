@@ -167,7 +167,7 @@
       <div class="drop-ring"><div class="drop-icon">✦</div></div>
       <div class="drop-title">Drop your GLB here</div>
       <div class="drop-sub">glb · gltf · obj · stl</div>
-      <input type="file" id="fileInput" accept=".obj" style="display:none" />
+      <input type="file" id="fileInput" accept=".obj,.mtl,.glb,.gltf" style="display:none" multiple />
       <label for="fileInput" class="drop-btn" id="dropBtn">Choose File</label>
     </div>
     <div id="loader"><div class="loader-ring"></div><div class="loader-text">Loading model…</div></div>
@@ -484,14 +484,24 @@ function createScene() {
   });
 }
 
+function loadFiles(files) {
+  // Register ALL files in Babylon's virtual filesystem first
+  BABYLON.FilesInput.FilesToLoad = BABYLON.FilesInput.FilesToLoad || {};
+  let objFile = null;
+  for(let i=0; i<files.length; i++) {
+    const f = files[i];
+    BABYLON.FilesInput.FilesToLoad[f.name.toLowerCase()] = f;
+    if(f.name.toLowerCase().endsWith('.obj')) objFile = f;
+    if(f.name.toLowerCase().endsWith('.glb') || f.name.toLowerCase().endsWith('.gltf')) objFile = f;
+  }
+  if(!objFile && files.length > 0) objFile = files[0];
+  if(objFile) loadModel(objFile);
+}
+
 function loadModel(file) {
   document.getElementById('loader').classList.add('visible');
   currentMeshes.forEach(m=>{try{m.dispose();}catch(e){}});
   currentMeshes=[];
-
-  // Register file in Babylon's virtual filesystem then load by name
-  BABYLON.FilesInput.FilesToLoad = BABYLON.FilesInput.FilesToLoad || {};
-  BABYLON.FilesInput.FilesToLoad[file.name.toLowerCase()] = file;
 
   BABYLON.SceneLoader.ImportMesh(
     '',
@@ -666,11 +676,11 @@ function bindControls() {
     inspectorOpen?scene.debugLayer.show({embedMode:false,overlay:true}):scene.debugLayer.hide();
   });
 
-  document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0]) loadModel(e.target.files[0]);});
+  document.getElementById('fileInput').addEventListener('change',e=>{ if(e.target.files.length) loadFiles(e.target.files); });
   const wrap=document.getElementById('canvasWrap');
   wrap.addEventListener('dragover',e=>{e.preventDefault();wrap.classList.add('drag-over');});
   wrap.addEventListener('dragleave',e=>{if(!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over');});
-  wrap.addEventListener('drop',e=>{e.preventDefault();wrap.classList.remove('drag-over');if(e.dataTransfer.files[0]) loadModel(e.dataTransfer.files[0]);});
+  wrap.addEventListener('drop',e=>{e.preventDefault();wrap.classList.remove('drag-over');if(e.dataTransfer.files.length) loadFiles(e.dataTransfer.files);});
 
   document.querySelectorAll('.preset-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
