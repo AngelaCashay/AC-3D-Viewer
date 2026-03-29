@@ -145,7 +145,7 @@
       transition: opacity 0.3s ease; white-space: nowrap;
     }
     #toast.show { opacity: 1; }
-    #fileInput { display: none; }
+    #fileInput { position: absolute; left: -9999px; top: -9999px; opacity: 0; width: 1px; height: 1px; }
   </style>
 </head>
 <body>
@@ -155,7 +155,7 @@
     <div class="hdr-btns">
       <button class="hbtn" id="btnWire">Wireframe</button>
       <button class="hbtn" id="btnReset">Reset View</button>
-      <button class="hbtn" id="btnLoad">Load File</button>
+      <label for="fileInput" class="hbtn" id="btnLoad">Load File</label>
       <button class="hbtn" id="btnInspector">Inspector</button>
       <button class="hbtn share-btn" id="btnShare">⬡ Share Look</button>
       <button class="hbtn on" id="btnPanel">Panel</button>
@@ -168,7 +168,7 @@
       <div class="drop-ring"><div class="drop-icon">✦</div></div>
       <div class="drop-title">Drop your GLB here</div>
       <div class="drop-sub">glb · gltf · obj · stl</div>
-      <button class="drop-btn" id="dropBtn">Choose File</button>
+      <label for="fileInput" class="drop-btn" id="dropBtn">Choose File</label>
     </div>
     <div id="loader"><div class="loader-ring"></div><div class="loader-text">Loading model…</div></div>
   </div>
@@ -625,7 +625,6 @@ function showToast(msg) {
 
 function bindControls() {
   document.getElementById('btnReset').addEventListener('click',frameCamera);
-  document.getElementById('btnLoad').addEventListener('click',()=>document.getElementById('fileInput').click());
   document.getElementById('btnShare').addEventListener('click',copyShareLink);
 
   document.getElementById('btnWire').addEventListener('click',()=>{
@@ -647,7 +646,6 @@ function bindControls() {
   });
 
   document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0]) loadModel(e.target.files[0]);});
-  document.getElementById('dropBtn').addEventListener('click',()=>document.getElementById('fileInput').click());
   const wrap=document.getElementById('canvasWrap');
   wrap.addEventListener('dragover',e=>{e.preventDefault();wrap.classList.add('drag-over');});
   wrap.addEventListener('dragleave',e=>{if(!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over');});
