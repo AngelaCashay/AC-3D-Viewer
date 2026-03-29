@@ -402,6 +402,21 @@
       <div class="toggle-row"><span class="toggle-name">Bounding Box</span><div class="toggle" id="tglBbox"></div></div>
     </div>
 
+    <!-- MATERIAL OVERRIDE -->
+    <div class="panel-section">
+      <div class="section-label">Material Override</div>
+      <div class="toggle-row"><span class="toggle-name">Override All</span><div class="toggle" id="tglMatOverride"></div></div>
+      <div class="color-row"><span class="color-name">Albedo Color</span><input type="color" id="colAlbedo" value="#ffffff" /></div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Metallic</span><span class="ctrl-val" id="valMetal">0.00</span></div>
+        <input type="range" id="sldMetal" min="0" max="1" step="0.01" value="0" />
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-label"><span class="ctrl-name">Roughness</span><span class="ctrl-val" id="valRough">0.50</span></div>
+        <input type="range" id="sldRough" min="0" max="1" step="0.01" value="0.5" />
+      </div>
+    </div>
+
   </div><!-- end panel -->
 
   <div id="statusBar">
@@ -769,6 +784,41 @@ function bindControls() {
     const on=tglBbox.classList.contains('on');
     currentMeshes.forEach(m=>{try{m.showBoundingBox=on;}catch(e){}});
   });
+
+  // Material override (safe async version for Feather files)
+  let matOverride=false;
+  function applyMatOverride() {
+    if(!matOverride){
+      currentMeshes.forEach(m=>{try{if(m._origMat){m.material=m._origMat;delete m._origMat;}}catch(e){}});
+      return;
+    }
+    const color=hexToColor3(document.getElementById('colAlbedo').value);
+    const metal=parseFloat(document.getElementById('sldMetal').value);
+    const rough=parseFloat(document.getElementById('sldRough').value);
+    let i=0;
+    function next(){
+      if(i>=currentMeshes.length) return;
+      const m=currentMeshes[i++];
+      try{
+        if(!m||!m.material||m.isDisposed()){next();return;}
+        if(!m._origMat) m._origMat=m.material;
+        if(m.material.albedoColor!==undefined){
+          m.material.albedoColor=color;
+          m.material.metallic=metal;
+          m.material.roughness=rough;
+        } else if(m.material.diffuseColor!==undefined){
+          m.material.diffuseColor=color;
+        }
+      }catch(e){}
+      setTimeout(next,0);
+    }
+    next();
+  }
+  const tglMat=document.getElementById('tglMatOverride');
+  tglMat.addEventListener('click',()=>{tglMat.classList.toggle('on');matOverride=tglMat.classList.contains('on');applyMatOverride();});
+  document.getElementById('colAlbedo').addEventListener('input',()=>{if(matOverride) applyMatOverride();});
+  bindSlider('sldMetal','valMetal',2,()=>{if(matOverride) applyMatOverride();});
+  bindSlider('sldRough','valRough',2,()=>{if(matOverride) applyMatOverride();});
 }
 
 createScene();
