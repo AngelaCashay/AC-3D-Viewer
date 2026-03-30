@@ -148,8 +148,19 @@ function createScene(p) {
   const rd=gf('rd','rotDir',1);
   scene.registerBeforeRender(()=>{if(rt) cam.alpha+=rs*rd});
 
-  // Halftone — applied after model loads, stored for later
-  scene._htParams={ on: gb('ht','ht'), size: gf('htSize','htSize',4) };
+  // Halftone params stored for after model loads
+  const htHex = g('htColor','htColor','000000');
+  scene._htParams = {
+    on: gb('ht','ht'),
+    size: gf('htSize','htSize',4),
+    angle: gf('htAngle','htAngle',0),
+    contrast: gf('htContrast','htContrast',1),
+    colorR: parseInt(htHex.slice(0,2),16)/255,
+    colorG: parseInt(htHex.slice(2,4),16)/255,
+    colorB: parseInt(htHex.slice(4,6),16)/255,
+    pattern: parseInt(g('htPattern','htPattern','0')),
+    colorMode: parseInt(g('htColorMode','htColorMode','0'))
+  };
 
   scene.createDefaultEnvironment({createGround:false,createSkybox:false});
 }
@@ -181,11 +192,18 @@ function init(){
     // Apply halftone if enabled
     const ht=scene._htParams;
     if(ht&&ht.on){
-      const htShader=`precision highp float;varying vec2 vUV;uniform sampler2D textureSampler;uniform vec2 screenSize;uniform float dotSize;void main(void){vec2 uv=vUV;vec2 p=floor(uv*screenSize/dotSize)*dotSize/screenSize;vec2 center=p+(dotSize*0.5)/screenSize;vec4 color=texture2D(textureSampler,center);float dist=distance(uv*screenSize,center*screenSize);float brightness=(color.r+color.g+color.b)/3.0;float radius=dotSize*0.5*brightness;float alpha=step(dist,radius);gl_FragColor=vec4(color.rgb*alpha,color.a);}`;
+      const htShader=`precision highp float;varying vec2 vUV;uniform sampler2D textureSampler;uniform vec2 screenSize;uniform float dotSize;uniform float angle;uniform float contrast;uniform vec3 dotColor;uniform int pattern;uniform int colorMode;vec2 rotate(vec2 p,float a){float c=cos(a);float s=sin(a);return vec2(p.x*c-p.y*s,p.x*s+p.y*c);}void main(void){vec2 px=vUV*screenSize;float rad=angle*3.14159/180.0;vec2 rotPx=rotate(px,rad);vec2 cell=floor(rotPx/dotSize);vec2 cellCenter=rotate((cell+0.5)*dotSize,-rad);vec4 color=texture2D(textureSampler,cellCenter/screenSize);float brightness=clamp((color.r+color.g+color.b)/3.0*contrast,0.0,1.0);float dist=distance(rotPx,rotate(cellCenter,rad));float alpha=0.0;if(pattern==0){float radius=dotSize*0.5*brightness;alpha=step(dist,radius);}else if(pattern==1){float linePos=mod(rotPx.y,dotSize)/dotSize;alpha=step(linePos,brightness);}else{float lx=mod(rotPx.x,dotSize)/dotSize;float ly=mod(rotPx.y,dotSize)/dotSize;float thresh=1.0-brightness;alpha=1.0-step(thresh,lx)*step(thresh,ly);}vec3 col=colorMode==1?color.rgb:dotColor;gl_FragColor=vec4(col*alpha,color.a);}`;
       BABYLON.Effect.ShadersStore['halftoneFragmentShader']=htShader;
-      const htPass=new BABYLON.PostProcess('halftone','halftone',['screenSize','dotSize'],null,1.0,cam);
-      const sz=ht.size;
-      htPass.onApply=effect=>{effect.setFloat2('screenSize',htPass.width,htPass.height);effect.setFloat('dotSize',sz)};
+      const htPass=new BABYLON.PostProcess('halftone','halftone',['screenSize','dotSize','angle','contrast','dotColor','pattern','colorMode'],null,1.0,cam);
+      htPass.onApply=effect=>{
+        effect.setFloat2('screenSize',htPass.width,htPass.height);
+        effect.setFloat('dotSize',ht.size);
+        effect.setFloat('angle',ht.angle);
+        effect.setFloat('contrast',ht.contrast);
+        effect.setFloat3('dotColor',ht.colorR,ht.colorG,ht.colorB);
+        effect.setInt('pattern',ht.pattern);
+        effect.setInt('colorMode',ht.colorMode);
+      };
     }
     G('ld').classList.add('h');
   },null,(sc,msg)=>{
