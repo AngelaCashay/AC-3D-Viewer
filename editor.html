@@ -377,7 +377,7 @@ const HT_COMPOSITE_SHADER = `
     vec4 bgSample=texture2D(textureSampler, vUV);
     vec4 meshSample=texture2D(meshSampler, vUV);
     // If pixel has no mesh (alpha~0), just show background unchanged
-    if(meshSample.a < 0.01){ gl_FragColor=bgSample; return; }
+    if(meshSample.a < 0.05){ gl_FragColor=bgSample; return; }
     vec2 px=vUV*screenSize;
     float rad=angle*3.14159/180.0;
     vec2 rotPx=rotate(px,rad);
