@@ -190,6 +190,16 @@ function init(){
   BABYLON.SceneLoader.ImportMesh('','',url,scene,ms=>{
     // Apply wireframe if set
     if(p.get('wf')==='1'||p.get('wire')==='1') ms.forEach(m=>{if(m.material)m.material.wireframe=true});
+    // Apply emissive override if set
+    const emOn=p.get('emOn')==='1';
+    if(emOn){
+      const emHex=p.get('emCol')||'c9a96e';
+      const emR=parseInt(emHex.slice(0,2),16)/255;
+      const emG=parseInt(emHex.slice(2,4),16)/255;
+      const emB=parseInt(emHex.slice(4,6),16)/255;
+      const emStr=parseFloat(p.get('emStr')||1);
+      ms.forEach(m=>{try{if(m.material&&m.material.emissiveColor!==undefined)m.material.emissiveColor=new BABYLON.Color3(emR*emStr,emG*emStr,emB*emStr);}catch(e){}});
+    }
     // Apply halftone if enabled
     const ht=scene._htParams;
     if(ht&&ht.on){

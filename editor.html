@@ -113,7 +113,8 @@
     <div class="ps">
       <div class="sl">Presets</div>
       <div class="pg">
-        <button class="pb a" data-p="faith">Faith</button>
+        <button class="pb" data-p="current">Current</button>
+        <button class="pb" data-p="faith">Faith</button>
         <button class="pb" data-p="studio">Studio</button>
         <button class="pb" data-p="neon">Neon</button>
         <button class="pb" data-p="soft">Soft Light</button>
@@ -128,6 +129,9 @@
       <div class="cr"><div class="cl"><span class="cn">Intensity</span><span class="cv" id="vGI">0.60</span></div><input type="range" id="sGI" min="0" max="2" step="0.01" value="0.6"/></div>
       <div class="cr"><div class="cl"><span class="cn">Blur Radius</span><span class="cv" id="vGB">32</span></div><input type="range" id="sGB" min="4" max="128" step="4" value="32"/></div>
       <div class="cor"><span class="con">Tint</span><input type="color" id="cG" value="#c9a96e"/></div>
+      <div class="tr"><span class="tn">Emissive Override</span><div class="tg" id="tEm"></div></div>
+      <div class="cor"><span class="con">Emissive Color</span><input type="color" id="cEm" value="#c9a96e"/></div>
+      <div class="cr"><div class="cl"><span class="cn">Emissive Strength</span><span class="cv" id="vEm">1.00</span></div><input type="range" id="sEm" min="0" max="3" step="0.01" value="1"/></div>
     </div>
 
     <div class="ps">
@@ -504,6 +508,7 @@ const PRESETS = {
 };
 
 function applyPreset(n) {
+  if(n==='current') return; // Current = keep all existing edits, do nothing
   const p=PRESETS[n]; if(!p) return;
   const c=h2c(p.bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1); G('cBg').value=p.bg;
   p.gOn?G('tG').classList.add('on'):G('tG').classList.remove('on');
@@ -531,6 +536,7 @@ function gather() {
   return {
     model: G('fnt').textContent,
     glowOn: tog('tG')?1:0, glowInt: G('sGI').value, glowBlur: G('sGB').value, glowCol: G('cG').value.replace('#',''),
+    emOn: tog('tEm')?1:0, emCol: G('cEm').value.replace('#',''), emStr: G('sEm').value,
     bg: G('cBg').value.replace('#',''),
     exp: G('sEx').value, contrast: G('sCo').value, sat: G('sSa').value, tone: G('sTn').value,
     keyInt: G('sKI').value, keyCol: G('cK').value.replace('#',''),
@@ -592,6 +598,28 @@ function bind() {
   sld('sGI','vGI',2,v=>{if(tog('tG'))glow.intensity=v});
   sld('sGB','vGB',0,v=>{glow.blurKernelSize=v});
   G('cG').addEventListener('input',e=>{const c=h2c(e.target.value);meshes.forEach(m=>{try{if(m.material&&m.material.emissiveColor)m.material.emissiveColor=c.scale(0.15)}catch(e){}})});
+
+  // Emissive override
+  function applyEmissiveOverride() {
+    if(!tog('tEm')) {
+      // Restore original emissive colors
+      meshes.forEach(m=>{try{if(m._origEmissive!==undefined){m.material.emissiveColor=m._origEmissive;delete m._origEmissive;}}catch(e){}});
+      return;
+    }
+    const col=h2c(G('cEm').value);
+    const str=parseFloat(G('sEm').value);
+    meshes.forEach(m=>{
+      try{
+        if(!m.material||m.isDisposed()) return;
+        if(m.material.emissiveColor===undefined) return;
+        if(m._origEmissive===undefined) m._origEmissive=m.material.emissiveColor.clone();
+        m.material.emissiveColor=col.scale(str);
+      }catch(e){}
+    });
+  }
+  G('tEm').addEventListener('click',()=>{G('tEm').classList.toggle('on');applyEmissiveOverride()});
+  G('cEm').addEventListener('input',()=>{if(tog('tEm'))applyEmissiveOverride()});
+  sld('sEm','vEm',2,()=>{if(tog('tEm'))applyEmissiveOverride()});
 
   // Background
   G('cBg').addEventListener('input',e=>{const c=h2c(e.target.value);scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1)});
