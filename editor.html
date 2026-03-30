@@ -326,10 +326,10 @@ function updateHalftone() {
     effect.setFloat('dotSize', parseFloat(G('sHt').value));
   };
 }
+function loadGLB(file) {
   G('ld').classList.add('v');
   meshes.forEach(m=>{try{m.dispose()}catch(e){}});
   meshes=[];
-  // Register in Babylon filesystem
   BABYLON.FilesInput.FilesToLoad = BABYLON.FilesInput.FilesToLoad||{};
   BABYLON.FilesInput.FilesToLoad[file.name.toLowerCase()] = file;
   BABYLON.SceneLoader.ImportMesh('','file:',file.name,scene,ms=>{
