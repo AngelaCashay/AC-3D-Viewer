@@ -207,7 +207,12 @@
     </div>
 
     <div class="ps">
-      <div class="sl">Camera</div>
+      <div class="sl">Halftone</div>
+      <div class="tr"><span class="tn">Enable</span><div class="tg" id="tHt"></div></div>
+      <div class="cr"><div class="cl"><span class="cn">Dot Size</span><span class="cv" id="vHt">4.0</span></div><input type="range" id="sHt" min="1" max="20" step="0.5" value="4"/></div>
+    </div>
+
+    <div class="ps">
       <div class="cr"><div class="cl"><span class="cn">Field of View</span><span class="cv" id="vFv">0.80</span></div><input type="range" id="sFv" min="0.2" max="2.5" step="0.01" value="0.8"/></div>
       <div class="tr"><span class="tn">Auto Rotate</span><div class="tg" id="tRt"></div></div>
       <div class="cr"><div class="cl"><span class="cn">Speed</span><span class="cv" id="vRS">0.005</span></div><input type="range" id="sRS" min="0.001" max="0.05" step="0.001" value="0.005"/></div>
@@ -234,6 +239,26 @@ const canvas = document.getElementById('rc');
 const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer:true, stencil:true});
 let scene, cam, glow, pipe, hemi, dir, fill, fill2;
 let meshes=[], wire=false, autoRot=false, f2on=false;
+let htPass=null, htOn=false;
+
+const HT_SHADER = `
+  precision highp float;
+  varying vec2 vUV;
+  uniform sampler2D textureSampler;
+  uniform vec2 screenSize;
+  uniform float dotSize;
+  void main(void){
+    vec2 uv=vUV;
+    vec2 p=floor(uv*screenSize/dotSize)*dotSize/screenSize;
+    vec2 center=p+(dotSize*0.5)/screenSize;
+    vec4 color=texture2D(textureSampler,center);
+    float dist=distance(uv*screenSize,center*screenSize);
+    float brightness=(color.r+color.g+color.b)/3.0;
+    float radius=dotSize*0.5*brightness;
+    float alpha=step(dist,radius);
+    gl_FragColor=vec4(color.rgb*alpha,color.a);
+  }
+`;
 
 function createScene() {
   scene = new BABYLON.Scene(engine);
@@ -281,7 +306,26 @@ const G = id => document.getElementById(id);
 const h2c = hex => new BABYLON.Color3(parseInt(hex.slice(1,3),16)/255,parseInt(hex.slice(3,5),16)/255,parseInt(hex.slice(5,7),16)/255);
 const tog = id => G(id).classList.contains('on');
 
-function loadGLB(file) {
+function createHalftone(dotSize) {
+  destroyHalftone();
+  BABYLON.Effect.ShadersStore['halftoneFragmentShader'] = HT_SHADER;
+  htPass = new BABYLON.PostProcess('halftone','halftone',['screenSize','dotSize'],null,1.0,cam);
+  htPass.onApply = effect => {
+    effect.setFloat2('screenSize', htPass.width, htPass.height);
+    effect.setFloat('dotSize', parseFloat(G('sHt').value));
+  };
+}
+
+function destroyHalftone() {
+  if(htPass){ htPass.dispose(); htPass=null; }
+}
+
+function updateHalftone() {
+  if(htOn && htPass) htPass.onApply = effect => {
+    effect.setFloat2('screenSize', htPass.width, htPass.height);
+    effect.setFloat('dotSize', parseFloat(G('sHt').value));
+  };
+}
   G('ld').classList.add('v');
   meshes.forEach(m=>{try{m.dispose()}catch(e){}});
   meshes=[];
@@ -362,28 +406,29 @@ function applyPreset(n) {
 
 function gather() {
   return {
-    model:G('fnt').textContent,
-    gOn:tog('tG')?1:0, gI:G('sGI').value, gB:G('sGB').value, gC:G('cG').value.replace('#',''),
-    bg:G('cBg').value.replace('#',''),
-    ex:G('sEx').value, co:G('sCo').value, sa:G('sSa').value, tn:G('sTn').value,
-    kI:G('sKI').value, kC:G('cK').value.replace('#',''),
-    kX:G('sKX').value, kY:G('sKY').value, kZ:G('sKZ').value,
-    sp:tog('tSp')?1:0,
-    aI:G('sAI').value, aC:G('cA').value.replace('#',''), gr:G('cGr').value.replace('#',''),
-    fI:G('sFI').value, fC:G('cF').value.replace('#',''),
-    fX:G('sFX').value, fY:G('sFY').value, fZ:G('sFZ').value,
-    f2:tog('tF2')?1:0, f2I:G('sF2').value, f2C:G('cF2').value.replace('#',''),
-    f2X:G('sF2X').value, f2Y:G('sF2Y').value, f2Z:G('sF2Z').value,
-    blOn:tog('tBl')?1:0, blI:G('sBI').value, blT:G('sBT').value, blK:G('sBK').value,
-    dfOn:tog('tDf')?1:0, dfD:G('sDD').value, dfA:G('sDA').value, dfL:G('sDL').value,
-    vgOn:tog('tVg')?1:0, vgI:G('sVI').value, vgC:G('cVg').value.replace('#',''),
-    gnOn:tog('tGn')?1:0, gnI:G('sGn').value,
-    ch:G('sCh').value, sh:G('sSh').value,
-    fv:G('sFv').value,
-    rt:tog('tRt')?1:0, rs:G('sRS').value, rd:G('sRD').value,
-    wf:tog('tWf')?1:0,
-    ca:cam.alpha.toFixed(4), cb:cam.beta.toFixed(4), cr:cam.radius.toFixed(4),
-    ctx:cam.target.x.toFixed(4), cty:cam.target.y.toFixed(4), ctz:cam.target.z.toFixed(4)
+    model: G('fnt').textContent,
+    glowOn: tog('tG')?1:0, glowInt: G('sGI').value, glowBlur: G('sGB').value, glowCol: G('cG').value.replace('#',''),
+    bg: G('cBg').value.replace('#',''),
+    exp: G('sEx').value, contrast: G('sCo').value, sat: G('sSa').value, tone: G('sTn').value,
+    keyInt: G('sKI').value, keyCol: G('cK').value.replace('#',''),
+    keyX: G('sKX').value, keyY: G('sKY').value, keyZ: G('sKZ').value,
+    spec: tog('tSp')?1:0,
+    ambInt: G('sAI').value, ambCol: G('cA').value.replace('#',''), groundCol: G('cGr').value.replace('#',''),
+    fillInt: G('sFI').value, fillCol: G('cF').value.replace('#',''),
+    fillX: G('sFX').value, fillY: G('sFY').value, fillZ: G('sFZ').value,
+    fill2On: tog('tF2')?1:0, fill2Int: G('sF2').value, fill2Col: G('cF2').value.replace('#',''),
+    fill2X: G('sF2X').value, fill2Y: G('sF2Y').value, fill2Z: G('sF2Z').value,
+    bloom: tog('tBl')?1:0, bloomInt: G('sBI').value, bloomThresh: G('sBT').value, bloomKernel: G('sBK').value,
+    dof: tog('tDf')?1:0, dofDist: G('sDD').value, dofAp: G('sDA').value, dofFocal: G('sDL').value,
+    vig: tog('tVg')?1:0, vigInt: G('sVI').value, vigCol: G('cVg').value.replace('#',''),
+    grain: tog('tGn')?1:0, grainInt: G('sGn').value,
+    chrom: G('sCh').value, sharp: G('sSh').value,
+    fov: G('sFv').value,
+    rotate: tog('tRt')?1:0, rotSpd: G('sRS').value, rotDir: G('sRD').value,
+    wire: tog('tWf')?1:0,
+    ht: tog('tHt')?1:0, htSize: G('sHt').value,
+    camAlpha: cam.alpha.toFixed(4), camBeta: cam.beta.toFixed(4), camRadius: cam.radius.toFixed(4),
+    camTX: cam.target.x.toFixed(4), camTY: cam.target.y.toFixed(4), camTZ: cam.target.z.toFixed(4)
   };
 }
 
@@ -502,6 +547,13 @@ function bind() {
 
   // Bounding box
   G('tBb').addEventListener('click',()=>{G('tBb').classList.toggle('on');const on=tog('tBb');meshes.forEach(m=>{try{m.showBoundingBox=on}catch(e){}})});
+
+  // Halftone
+  G('tHt').addEventListener('click',()=>{
+    G('tHt').classList.toggle('on'); htOn=tog('tHt');
+    htOn?createHalftone(parseFloat(G('sHt').value)):destroyHalftone();
+  });
+  sld('sHt','vHt',1,v=>{ if(htOn) updateHalftone(); });
 }
 
 createScene();

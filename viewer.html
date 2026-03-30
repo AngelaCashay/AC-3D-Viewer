@@ -148,6 +148,9 @@ function createScene(p) {
   const rd=gf('rd','rotDir',1);
   scene.registerBeforeRender(()=>{if(rt) cam.alpha+=rs*rd});
 
+  // Halftone — applied after model loads, stored for later
+  scene._htParams={ on: gb('ht','ht'), size: gf('htSize','htSize',4) };
+
   scene.createDefaultEnvironment({createGround:false,createSkybox:false});
 }
 
@@ -174,7 +177,16 @@ function init(){
   const url=MODEL_BASE+encodeURIComponent(model);
   BABYLON.SceneLoader.ImportMesh('','',url,scene,ms=>{
     // Apply wireframe if set
-    if(p.get('wf')==='1') ms.forEach(m=>{if(m.material)m.material.wireframe=true});
+    if(p.get('wf')==='1'||p.get('wire')==='1') ms.forEach(m=>{if(m.material)m.material.wireframe=true});
+    // Apply halftone if enabled
+    const ht=scene._htParams;
+    if(ht&&ht.on){
+      const htShader=`precision highp float;varying vec2 vUV;uniform sampler2D textureSampler;uniform vec2 screenSize;uniform float dotSize;void main(void){vec2 uv=vUV;vec2 p=floor(uv*screenSize/dotSize)*dotSize/screenSize;vec2 center=p+(dotSize*0.5)/screenSize;vec4 color=texture2D(textureSampler,center);float dist=distance(uv*screenSize,center*screenSize);float brightness=(color.r+color.g+color.b)/3.0;float radius=dotSize*0.5*brightness;float alpha=step(dist,radius);gl_FragColor=vec4(color.rgb*alpha,color.a);}`;
+      BABYLON.Effect.ShadersStore['halftoneFragmentShader']=htShader;
+      const htPass=new BABYLON.PostProcess('halftone','halftone',['screenSize','dotSize'],null,1.0,cam);
+      const sz=ht.size;
+      htPass.onApply=effect=>{effect.setFloat2('screenSize',htPass.width,htPass.height);effect.setFloat('dotSize',sz)};
+    }
     G('ld').classList.add('h');
   },null,(sc,msg)=>{
     console.error(msg);
