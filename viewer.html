@@ -159,7 +159,8 @@ function createScene(p) {
     colorG: parseInt(htHex.slice(2,4),16)/255,
     colorB: parseInt(htHex.slice(4,6),16)/255,
     pattern: parseInt(g('htPattern','htPattern','0')),
-    colorMode: parseInt(g('htColorMode','htColorMode','0'))
+    colorMode: parseInt(g('htColorMode','htColorMode','0')),
+    glbOnly: gb('htGlbOnly','htGlbOnly')
   };
 
   scene.createDefaultEnvironment({createGround:false,createSkybox:false});
@@ -192,18 +193,33 @@ function init(){
     // Apply halftone if enabled
     const ht=scene._htParams;
     if(ht&&ht.on){
-      const htShader=`precision highp float;varying vec2 vUV;uniform sampler2D textureSampler;uniform vec2 screenSize;uniform float dotSize;uniform float angle;uniform float contrast;uniform vec3 dotColor;uniform int pattern;uniform int colorMode;vec2 rotate(vec2 p,float a){float c=cos(a);float s=sin(a);return vec2(p.x*c-p.y*s,p.x*s+p.y*c);}void main(void){vec2 px=vUV*screenSize;float rad=angle*3.14159/180.0;vec2 rotPx=rotate(px,rad);vec2 cell=floor(rotPx/dotSize);vec2 cellCenter=rotate((cell+0.5)*dotSize,-rad);vec4 color=texture2D(textureSampler,cellCenter/screenSize);float brightness=clamp((color.r+color.g+color.b)/3.0*contrast,0.0,1.0);float dist=distance(rotPx,rotate(cellCenter,rad));float alpha=0.0;if(pattern==0){float radius=dotSize*0.5*brightness;alpha=step(dist,radius);}else if(pattern==1){float linePos=mod(rotPx.y,dotSize)/dotSize;alpha=step(linePos,brightness);}else{float lx=mod(rotPx.x,dotSize)/dotSize;float ly=mod(rotPx.y,dotSize)/dotSize;float thresh=1.0-brightness;alpha=1.0-step(thresh,lx)*step(thresh,ly);}vec3 col=colorMode==1?color.rgb:dotColor;gl_FragColor=vec4(col*alpha,color.a);}`;
-      BABYLON.Effect.ShadersStore['halftoneFragmentShader']=htShader;
-      const htPass=new BABYLON.PostProcess('halftone','halftone',['screenSize','dotSize','angle','contrast','dotColor','pattern','colorMode'],null,1.0,cam);
-      htPass.onApply=effect=>{
-        effect.setFloat2('screenSize',htPass.width,htPass.height);
-        effect.setFloat('dotSize',ht.size);
-        effect.setFloat('angle',ht.angle);
-        effect.setFloat('contrast',ht.contrast);
-        effect.setFloat3('dotColor',ht.colorR,ht.colorG,ht.colorB);
-        effect.setInt('pattern',ht.pattern);
-        effect.setInt('colorMode',ht.colorMode);
-      };
+      const htShaderSrc=`precision highp float;varying vec2 vUV;uniform sampler2D textureSampler;uniform vec2 screenSize;uniform float dotSize;uniform float angle;uniform float contrast;uniform vec3 dotColor;uniform int pattern;uniform int colorMode;vec2 rotate(vec2 p,float a){float c=cos(a);float s=sin(a);return vec2(p.x*c-p.y*s,p.x*s+p.y*c);}void main(void){vec2 px=vUV*screenSize;float rad=angle*3.14159/180.0;vec2 rotPx=rotate(px,rad);vec2 cell=floor(rotPx/dotSize);vec2 cellCenter=rotate((cell+0.5)*dotSize,-rad);vec4 color=texture2D(textureSampler,cellCenter/screenSize);float brightness=clamp((color.r+color.g+color.b)/3.0*contrast,0.0,1.0);float dist=distance(rotPx,rotate(cellCenter,rad));float alpha=0.0;if(pattern==0){float radius=dotSize*0.5*brightness;alpha=step(dist,radius);}else if(pattern==1){float linePos=mod(rotPx.y,dotSize)/dotSize;alpha=step(linePos,brightness);}else{float lx=mod(rotPx.x,dotSize)/dotSize;float ly=mod(rotPx.y,dotSize)/dotSize;float thresh=1.0-brightness;alpha=1.0-step(thresh,lx)*step(thresh,ly);}vec3 col=colorMode==1?color.rgb:dotColor;gl_FragColor=vec4(col*alpha,color.a);}`;
+      const htCompSrc=`precision highp float;varying vec2 vUV;uniform sampler2D textureSampler;uniform sampler2D meshSampler;uniform vec2 screenSize;uniform float dotSize;uniform float angle;uniform float contrast;uniform vec3 dotColor;uniform int pattern;uniform int colorMode;uniform vec3 bgColor;vec2 rotate(vec2 p,float a){float c=cos(a);float s=sin(a);return vec2(p.x*c-p.y*s,p.x*s+p.y*c);}void main(void){vec4 bgSample=texture2D(textureSampler,vUV);vec4 meshSample=texture2D(meshSampler,vUV);if(meshSample.a<0.01){gl_FragColor=bgSample;return;}vec2 px=vUV*screenSize;float rad=angle*3.14159/180.0;vec2 rotPx=rotate(px,rad);vec2 cell=floor(rotPx/dotSize);vec2 cellCenter=rotate((cell+0.5)*dotSize,-rad);vec4 color=texture2D(meshSampler,cellCenter/screenSize);float brightness=clamp((color.r+color.g+color.b)/3.0*contrast,0.0,1.0);float dist=distance(rotPx,rotate(cellCenter,rad));float alpha=0.0;if(pattern==0){float radius=dotSize*0.5*brightness;alpha=step(dist,radius);}else if(pattern==1){float linePos=mod(rotPx.y,dotSize)/dotSize;alpha=step(linePos,brightness);}else{float lx=mod(rotPx.x,dotSize)/dotSize;float ly=mod(rotPx.y,dotSize)/dotSize;float thresh=1.0-brightness;alpha=1.0-step(thresh,lx)*step(thresh,ly);}vec3 col=colorMode==1?color.rgb:dotColor;vec3 final=mix(bgSample.rgb,col,alpha);gl_FragColor=vec4(final,1.0);}`;
+
+      if(ht.glbOnly){
+        BABYLON.Effect.ShadersStore['halftoneCompositeFragmentShader']=htCompSrc;
+        const rtt=new BABYLON.RenderTargetTexture('htRTT',{width:engine.getRenderWidth(),height:engine.getRenderHeight()},scene,false);
+        ms.forEach(m=>{try{rtt.renderList.push(m)}catch(e){}});
+        scene.customRenderTargets.push(rtt);
+        const htPass=new BABYLON.PostProcess('halftone','halftoneComposite',['screenSize','dotSize','angle','contrast','dotColor','pattern','colorMode','bgColor'],['meshSampler'],1.0,cam);
+        htPass.onApply=effect=>{
+          effect.setFloat2('screenSize',htPass.width,htPass.height);
+          effect.setFloat('dotSize',ht.size); effect.setFloat('angle',ht.angle); effect.setFloat('contrast',ht.contrast);
+          effect.setFloat3('dotColor',ht.colorR,ht.colorG,ht.colorB);
+          effect.setInt('pattern',ht.pattern); effect.setInt('colorMode',ht.colorMode);
+          effect.setTexture('meshSampler',rtt);
+          effect.setFloat3('bgColor',scene.clearColor.r,scene.clearColor.g,scene.clearColor.b);
+        };
+      } else {
+        BABYLON.Effect.ShadersStore['halftoneFragmentShader']=htShaderSrc;
+        const htPass=new BABYLON.PostProcess('halftone','halftone',['screenSize','dotSize','angle','contrast','dotColor','pattern','colorMode'],null,1.0,cam);
+        htPass.onApply=effect=>{
+          effect.setFloat2('screenSize',htPass.width,htPass.height);
+          effect.setFloat('dotSize',ht.size); effect.setFloat('angle',ht.angle); effect.setFloat('contrast',ht.contrast);
+          effect.setFloat3('dotColor',ht.colorR,ht.colorG,ht.colorB);
+          effect.setInt('pattern',ht.pattern); effect.setInt('colorMode',ht.colorMode);
+        };
+      }
     }
     G('ld').classList.add('h');
   },null,(sc,msg)=>{

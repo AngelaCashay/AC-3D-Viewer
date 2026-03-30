@@ -215,6 +215,7 @@
       <div class="cr"><div class="cl"><span class="cn">Contrast</span><span class="cv" id="vHtC">1.00</span></div><input type="range" id="sHtC" min="0.1" max="3" step="0.05" value="1"/></div>
       <div class="cor"><span class="con">Dot Color</span><input type="color" id="cHt" value="#000000"/></div>
       <div class="tr"><span class="tn">Color Mode</span><div class="tg" id="tHtC"></div></div>
+      <div class="tr"><span class="tn">GLB Only</span><div class="tg" id="tHtG"></div></div>
     </div>
 
     <div class="ps">
@@ -352,20 +353,102 @@ function getHtUniforms(effect) {
   effect.setInt('colorMode', tog('tHtC')?1:0);
 }
 
+// Extended shader for GLB-only mode — composites halftone layer over plain background
+const HT_COMPOSITE_SHADER = `
+  precision highp float;
+  varying vec2 vUV;
+  uniform sampler2D textureSampler;
+  uniform sampler2D meshSampler;
+  uniform vec2 screenSize;
+  uniform float dotSize;
+  uniform float angle;
+  uniform float contrast;
+  uniform vec3 dotColor;
+  uniform int pattern;
+  uniform int colorMode;
+  uniform vec3 bgColor;
+
+  vec2 rotate(vec2 p, float a){
+    float c=cos(a); float s=sin(a);
+    return vec2(p.x*c-p.y*s, p.x*s+p.y*c);
+  }
+
+  void main(void){
+    vec4 bgSample=texture2D(textureSampler, vUV);
+    vec4 meshSample=texture2D(meshSampler, vUV);
+    // If pixel has no mesh (alpha~0), just show background unchanged
+    if(meshSample.a < 0.01){ gl_FragColor=bgSample; return; }
+    vec2 px=vUV*screenSize;
+    float rad=angle*3.14159/180.0;
+    vec2 rotPx=rotate(px,rad);
+    vec2 cell=floor(rotPx/dotSize);
+    vec2 cellCenter=rotate((cell+0.5)*dotSize,-rad);
+    vec4 color=texture2D(meshSampler,cellCenter/screenSize);
+    float brightness=clamp((color.r+color.g+color.b)/3.0*contrast,0.0,1.0);
+    float dist=distance(rotPx,rotate(cellCenter,rad));
+    float alpha=0.0;
+    if(pattern==0){
+      float radius=dotSize*0.5*brightness;
+      alpha=step(dist,radius);
+    } else if(pattern==1){
+      float linePos=mod(rotPx.y,dotSize)/dotSize;
+      alpha=step(linePos,brightness);
+    } else {
+      float lx=mod(rotPx.x,dotSize)/dotSize;
+      float ly=mod(rotPx.y,dotSize)/dotSize;
+      float thresh=1.0-brightness;
+      alpha=1.0-step(thresh,lx)*step(thresh,ly);
+    }
+    vec3 col=colorMode==1?color.rgb:dotColor;
+    // Composite: halftone dots over background
+    vec3 final=mix(bgSample.rgb, col, alpha);
+    gl_FragColor=vec4(final, 1.0);
+  }
+`;
+
+let htRTT=null;
+
 function createHalftone() {
   destroyHalftone();
+  const glbOnly = tog('tHtG');
   BABYLON.Effect.ShadersStore['halftoneFragmentShader'] = HT_SHADER;
-  htPass = new BABYLON.PostProcess('halftone','halftone',['screenSize','dotSize','angle','contrast','dotColor','pattern','colorMode'],null,1.0,cam);
-  htPass.onApply = effect => getHtUniforms(effect);
+
+  if(glbOnly && meshes.length) {
+    // Render meshes to offscreen texture
+    htRTT = new BABYLON.RenderTargetTexture('htRTT', {width:engine.getRenderWidth(),height:engine.getRenderHeight()}, scene, false);
+    meshes.forEach(m=>{ try{ htRTT.renderList.push(m); }catch(e){} });
+    scene.customRenderTargets.push(htRTT);
+
+    // Use composite shader
+    BABYLON.Effect.ShadersStore['halftoneCompositeFragmentShader'] = HT_COMPOSITE_SHADER;
+    htPass = new BABYLON.PostProcess('halftone','halftoneComposite',
+      ['screenSize','dotSize','angle','contrast','dotColor','pattern','colorMode','bgColor'],
+      ['meshSampler'], 1.0, cam);
+    htPass.onApply = effect => {
+      getHtUniforms(effect);
+      effect.setTexture('meshSampler', htRTT);
+      const bg = scene.clearColor;
+      effect.setFloat3('bgColor', bg.r, bg.g, bg.b);
+    };
+  } else {
+    // Full screen halftone (original behavior)
+    htPass = new BABYLON.PostProcess('halftone','halftone',
+      ['screenSize','dotSize','angle','contrast','dotColor','pattern','colorMode'],
+      null, 1.0, cam);
+    htPass.onApply = effect => getHtUniforms(effect);
+  }
 }
 
 function destroyHalftone() {
   if(htPass){ htPass.dispose(); htPass=null; }
+  if(htRTT){
+    const idx=scene.customRenderTargets.indexOf(htRTT);
+    if(idx>-1) scene.customRenderTargets.splice(idx,1);
+    htRTT.dispose(); htRTT=null;
+  }
 }
 
-function updateHalftone() {
-  // onApply already reads live values — nothing extra needed
-}
+function updateHalftone() {}
 function loadGLB(file) {
   G('ld').classList.add('v');
   meshes.forEach(m=>{try{m.dispose()}catch(e){}});
@@ -468,7 +551,7 @@ function gather() {
     wire: tog('tWf')?1:0,
     ht: tog('tHt')?1:0, htSize: G('sHt').value, htAngle: G('sHtA').value,
     htContrast: G('sHtC').value, htColor: G('cHt').value.replace('#',''),
-    htPattern: G('sHtP').value, htColorMode: tog('tHtC')?1:0,
+    htPattern: G('sHtP').value, htColorMode: tog('tHtC')?1:0, htGlbOnly: tog('tHtG')?1:0,
     camAlpha: cam.alpha.toFixed(4), camBeta: cam.beta.toFixed(4), camRadius: cam.radius.toFixed(4),
     camTX: cam.target.x.toFixed(4), camTY: cam.target.y.toFixed(4), camTZ: cam.target.z.toFixed(4)
   };
@@ -598,9 +681,10 @@ function bind() {
   sld('sHt','vHt',1,()=>{}); 
   sld('sHtA','vHtA',0,()=>{});
   sld('sHtC','vHtC',2,()=>{});
-  G('sHtP').addEventListener('change',()=>{});
+  G('sHtP').addEventListener('change',()=>{ if(htOn) createHalftone(); });
   G('cHt').addEventListener('input',()=>{});
   G('tHtC').addEventListener('click',()=>G('tHtC').classList.toggle('on'));
+  G('tHtG').addEventListener('click',()=>{ G('tHtG').classList.toggle('on'); if(htOn) createHalftone(); });
 }
 
 createScene();
