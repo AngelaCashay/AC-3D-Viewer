@@ -198,7 +198,15 @@ function init(){
       const emG=parseInt(emHex.slice(2,4),16)/255;
       const emB=parseInt(emHex.slice(4,6),16)/255;
       const emStr=parseFloat(p.get('emStr')||1);
-      ms.forEach(m=>{try{if(m.material&&m.material.emissiveColor!==undefined)m.material.emissiveColor=new BABYLON.Color3(emR*emStr,emG*emStr,emB*emStr);}catch(e){}});
+      ms.forEach(m=>{
+        try{
+          if(!m.material||m.material.emissiveColor===undefined) return;
+          const orig=m.material.emissiveColor;
+          // Only override meshes that already have meaningful emission from Blender
+          if((orig.r+orig.g+orig.b) < 0.05) return;
+          m.material.emissiveColor=new BABYLON.Color3(emR*emStr,emG*emStr,emB*emStr);
+        }catch(e){}
+      });
     }
     // Apply halftone if enabled
     const ht=scene._htParams;

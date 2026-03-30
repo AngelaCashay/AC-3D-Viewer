@@ -507,9 +507,94 @@ const PRESETS = {
   void:  {bg:'#000000',gOn:true,gI:0.9,gB:96,gC:'#00aaff',kI:0.3,kC:'#001133',aI:0.1,aC:'#000033',fI:0.8,fC:'#0055ff',blOn:true,blI:1.5,dfOn:true,ex:0.8,co:1.3,sa:1.2}
 };
 
+function resetAllControls() {
+  // Glow
+  G('tG').classList.add('on'); glow.intensity=0.6;
+  G('sGI').value=0.6; G('vGI').textContent='0.60';
+  G('sGB').value=32; G('vGB').textContent='32';
+  G('cG').value='#c9a96e';
+
+  // Emissive
+  G('tEm').classList.remove('on');
+  G('cEm').value='#c9a96e'; G('sEm').value=1; G('vEm').textContent='1.00';
+
+  // Background
+  G('cBg').value='#080808';
+  const def=h2c('#080808'); scene.clearColor=new BABYLON.Color4(def.r,def.g,def.b,1);
+  pipe.imageProcessing.exposure=1; G('sEx').value=1; G('vEx').textContent='1.00';
+  pipe.imageProcessing.contrast=1; G('sCo').value=1; G('vCo').textContent='1.00';
+  G('sSa').value=1; G('vSa').textContent='1.00';
+  if(pipe.imageProcessing.colorCurves) pipe.imageProcessing.colorCurves.globalSaturation=0;
+  G('sTn').value=0; pipe.imageProcessing.toneMappingEnabled=false;
+
+  // Key light
+  dir.intensity=0.8; dir.diffuse=new BABYLON.Color3(1,0.961,0.851);
+  dir.direction=new BABYLON.Vector3(-1,-2,-1);
+  dir.specular=new BABYLON.Color3(1,1,1);
+  G('sKI').value=0.8; G('vKI').textContent='0.80'; G('cK').value='#fff4d9';
+  G('sKX').value=-1; G('vKX').textContent='-1.00';
+  G('sKY').value=-2; G('vKY').textContent='-2.00';
+  G('sKZ').value=-1; G('vKZ').textContent='-1.00';
+  G('tSp').classList.add('on');
+
+  // Ambient
+  hemi.intensity=0.4; hemi.diffuse=new BABYLON.Color3(0.9,0.85,1);
+  hemi.groundColor=new BABYLON.Color3(0.1,0.08,0.15);
+  G('sAI').value=0.4; G('vAI').textContent='0.40';
+  G('cA').value='#e6d9ff'; G('cGr').value='#1a1412';
+
+  // Fill
+  fill.intensity=0.3; fill.diffuse=new BABYLON.Color3(0.6,0.7,1);
+  fill.position=new BABYLON.Vector3(2,1,2);
+  G('sFI').value=0.3; G('vFI').textContent='0.30'; G('cF').value='#99b3ff';
+  G('sFX').value=2; G('vFX').textContent='2.00';
+  G('sFY').value=1; G('vFY').textContent='1.00';
+  G('sFZ').value=2; G('vFZ').textContent='2.00';
+
+  // Fill 2
+  G('tF2').classList.remove('on'); f2on=false; fill2.intensity=0;
+  G('sF2').value=0.2; G('vF2').textContent='0.20';
+
+  // Bloom
+  pipe.bloomEnabled=false; G('tBl').classList.remove('on');
+  pipe.bloomIntensity=0.5; pipe.bloomThreshold=0.3; pipe.bloomKernel=64;
+  G('sBI').value=0.5; G('vBI').textContent='0.50';
+  G('sBT').value=0.3; G('vBT').textContent='0.30';
+  G('sBK').value=64; G('vBK').textContent='64';
+
+  // DOF
+  pipe.depthOfFieldEnabled=false; G('tDf').classList.remove('on');
+
+  // Vignette
+  pipe.imageProcessing.vignetteEnabled=false; G('tVg').classList.remove('on');
+
+  // Grain
+  pipe.grainEnabled=false; G('tGn').classList.remove('on');
+
+  // Chromatic & sharpen
+  pipe.chromaticAberrationEnabled=false; G('sCh').value=0; G('vCh').textContent='0.00';
+  pipe.sharpenEnabled=false; G('sSh').value=0; G('vSh').textContent='0.00';
+
+  // Camera
+  cam.fov=0.8; G('sFv').value=0.8; G('vFv').textContent='0.80';
+  autoRot=false; G('tRt').classList.remove('on');
+
+  // Wireframe
+  wire=false; G('tWf').classList.remove('on'); applyWire();
+
+  // Halftone
+  if(htOn){ destroyHalftone(); htOn=false; }
+  G('tHt').classList.remove('on');
+}
+
 function applyPreset(n) {
-  if(n==='current') return; // Current = keep all existing edits, do nothing
+  if(n==='current') return;
   const p=PRESETS[n]; if(!p) return;
+
+  // Full reset first so no state bleeds from previous preset
+  resetAllControls();
+
+  // Then apply preset values
   const c=h2c(p.bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1); G('cBg').value=p.bg;
   p.gOn?G('tG').classList.add('on'):G('tG').classList.remove('on');
   glow.intensity=p.gOn?p.gI:0;
@@ -524,6 +609,12 @@ function applyPreset(n) {
   G('sFI').value=p.fI; G('vFI').textContent=p.fI.toFixed(2); G('cF').value=p.fC;
   pipe.imageProcessing.exposure=p.ex; G('sEx').value=p.ex; G('vEx').textContent=p.ex.toFixed(2);
   pipe.imageProcessing.contrast=p.co; G('sCo').value=p.co; G('vCo').textContent=p.co.toFixed(2);
+  if(p.sa!==undefined){
+    G('sSa').value=p.sa; G('vSa').textContent=p.sa.toFixed(2);
+    if(!pipe.imageProcessing.colorCurves) pipe.imageProcessing.colorCurves=new BABYLON.ColorCurves();
+    pipe.imageProcessing.colorCurvesEnabled=true;
+    pipe.imageProcessing.colorCurves.globalSaturation=(p.sa-1)*100;
+  }
   pipe.bloomEnabled=p.blOn; pipe.bloomIntensity=p.blI;
   p.blOn?G('tBl').classList.add('on'):G('tBl').classList.remove('on');
   G('sBI').value=p.blI; G('vBI').textContent=p.blI.toFixed(2);
@@ -603,7 +694,7 @@ function bind() {
   function applyEmissiveOverride() {
     if(!tog('tEm')) {
       // Restore original emissive colors
-      meshes.forEach(m=>{try{if(m._origEmissive!==undefined){m.material.emissiveColor=m._origEmissive;delete m._origEmissive;}}catch(e){}});
+      meshes.forEach(m=>{try{if(m._origEmissive!==undefined){m.material.emissiveColor=m._origEmissive.clone();delete m._origEmissive;}}catch(e){}});
       return;
     }
     const col=h2c(G('cEm').value);
@@ -612,7 +703,11 @@ function bind() {
       try{
         if(!m.material||m.isDisposed()) return;
         if(m.material.emissiveColor===undefined) return;
-        if(m._origEmissive===undefined) m._origEmissive=m.material.emissiveColor.clone();
+        // Only override meshes that already have meaningful emission from Blender
+        const orig = m._origEmissive || m.material.emissiveColor.clone();
+        const hasEmission = (orig.r+orig.g+orig.b) > 0.05;
+        if(!hasEmission) return;
+        if(m._origEmissive===undefined) m._origEmissive=orig;
         m.material.emissiveColor=col.scale(str);
       }catch(e){}
     });
