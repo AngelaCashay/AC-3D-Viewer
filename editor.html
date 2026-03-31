@@ -595,7 +595,10 @@ function takeSnapshot() {
 }
 
 function restoreSnapshot() {
-  if(!currentSnapshot) return;
+  if(!currentSnapshot) {
+    toast('Click "Save as Current" first to save your look');
+    return;
+  }
   const s = currentSnapshot;
   // Background
   const c=h2c('#'+s.bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1); G('cBg').value='#'+s.bg;
@@ -741,7 +744,12 @@ function bind() {
   document.querySelectorAll('.pb').forEach(b=>{
     b.addEventListener('click',()=>{document.querySelectorAll('.pb').forEach(x=>x.classList.remove('a'));b.classList.add('a');applyPreset(b.dataset.p)});
   });
-  G('bSnap').addEventListener('click',()=>{ takeSnapshot(); toast('Current saved — click ↩ Current to restore'); });
+  G('bSnap').addEventListener('click',()=>{
+    takeSnapshot();
+    G('bSnap').textContent='✓ Saved';
+    setTimeout(()=>G('bSnap').textContent='Save as Current',2000);
+    toast('Current saved — click ↩ Current to restore');
+  });
 
   // Glow
   G('tG').addEventListener('click',()=>{G('tG').classList.toggle('on');glow.intensity=tog('tG')?parseFloat(G('sGI').value):0});
