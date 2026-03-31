@@ -113,7 +113,7 @@
     <div class="ps">
       <div class="sl">Presets</div>
       <div class="pg">
-        <button class="pb" data-p="current">Current</button>
+        <button class="pb" data-p="current">↩ Current</button>
         <button class="pb" data-p="faith">Faith</button>
         <button class="pb" data-p="studio">Studio</button>
         <button class="pb" data-p="neon">Neon</button>
@@ -121,6 +121,7 @@
         <button class="pb" data-p="sketch">Sketch</button>
         <button class="pb" data-p="void">Void</button>
       </div>
+      <button class="db" id="bSnap" style="width:100%;margin-top:8px;font-size:8px;letter-spacing:.2em;padding:7px">Save as Current</button>
     </div>
 
     <div class="ps">
@@ -646,8 +647,6 @@ function applyPreset(n) {
     restoreSnapshot();
     return;
   }
-  // Snapshot current state before overwriting
-  takeSnapshot();
   const p=PRESETS[n]; if(!p) return;
 
   // Full reset first so no state bleeds from previous preset
@@ -742,6 +741,7 @@ function bind() {
   document.querySelectorAll('.pb').forEach(b=>{
     b.addEventListener('click',()=>{document.querySelectorAll('.pb').forEach(x=>x.classList.remove('a'));b.classList.add('a');applyPreset(b.dataset.p)});
   });
+  G('bSnap').addEventListener('click',()=>{ takeSnapshot(); toast('Current saved — click ↩ Current to restore'); });
 
   // Glow
   G('tG').addEventListener('click',()=>{G('tG').classList.toggle('on');glow.intensity=tog('tG')?parseFloat(G('sGI').value):0});
