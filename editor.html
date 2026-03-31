@@ -599,7 +599,10 @@ function restoreSnapshot() {
     toast('Click "Save as Current" first to save your look');
     return;
   }
+  // Reset everything first then apply snapshot on top
+  resetAllControls();
   const s = currentSnapshot;
+  const isOn = v => v===1||v==='1'||v===true;
   // Background
   const c=h2c('#'+s.bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1); G('cBg').value='#'+s.bg;
   // Exposure/contrast/sat
@@ -611,7 +614,7 @@ function restoreSnapshot() {
   pipe.imageProcessing.colorCurvesEnabled=true;
   pipe.imageProcessing.colorCurves.globalSaturation=(sa-1)*100;
   // Glow
-  const gOn=s.glowOn==='1'||s.glowOn===1;
+  const gOn=isOn(s.glowOn);
   gOn?G('tG').classList.add('on'):G('tG').classList.remove('on');
   glow.intensity=gOn?parseFloat(s.glowInt):0;
   G('sGI').value=s.glowInt; G('vGI').textContent=parseFloat(s.glowInt).toFixed(2);
@@ -631,17 +634,17 @@ function restoreSnapshot() {
   fill.intensity=parseFloat(s.fillInt); fill.diffuse=h2c('#'+s.fillCol);
   G('sFI').value=s.fillInt; G('vFI').textContent=parseFloat(s.fillInt).toFixed(2); G('cF').value='#'+s.fillCol;
   // Bloom
-  const blOn=s.bloom==='1'||s.bloom===1;
+  const blOn=isOn(s.bloom);
   pipe.bloomEnabled=blOn; blOn?G('tBl').classList.add('on'):G('tBl').classList.remove('on');
   pipe.bloomIntensity=parseFloat(s.bloomInt); G('sBI').value=s.bloomInt; G('vBI').textContent=parseFloat(s.bloomInt).toFixed(2);
   // DOF
-  const dfOn=s.dof==='1'||s.dof===1;
+  const dfOn=isOn(s.dof);
   pipe.depthOfFieldEnabled=dfOn; dfOn?G('tDf').classList.add('on'):G('tDf').classList.remove('on');
   // Wireframe
-  wire=s.wire==='1'||s.wire===1;
+  wire=isOn(s.wire);
   wire?G('tWf').classList.add('on'):G('tWf').classList.remove('on'); applyWire();
   // Auto rotate
-  autoRot=s.rotate==='1'||s.rotate===1;
+  autoRot=isOn(s.rotate);
   autoRot?G('tRt').classList.add('on'):G('tRt').classList.remove('on');
 }
 
