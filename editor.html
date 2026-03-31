@@ -121,7 +121,7 @@
         <button class="pb" data-p="sketch">Sketch</button>
         <button class="pb" data-p="void">Void</button>
       </div>
-      <button class="db" id="bSnap" style="width:100%;margin-top:8px;font-size:8px;letter-spacing:.2em;padding:7px">Save as Current</button>
+      <button class="db" id="bSnap" onclick="takeSnapshot();this.textContent='✓ Saved';setTimeout(()=>this.textContent='Save as Current',2000);toast('Saved — click ↩ Current to restore')" style="width:100%;margin-top:8px;font-size:8px;letter-spacing:.2em;padding:7px">Save as Current</button>
     </div>
 
     <div class="ps">
@@ -743,12 +743,6 @@ function bind() {
   // Presets
   document.querySelectorAll('.pb').forEach(b=>{
     b.addEventListener('click',()=>{document.querySelectorAll('.pb').forEach(x=>x.classList.remove('a'));b.classList.add('a');applyPreset(b.dataset.p)});
-  });
-  G('bSnap').addEventListener('click',()=>{
-    takeSnapshot();
-    G('bSnap').textContent='✓ Saved';
-    setTimeout(()=>G('bSnap').textContent='Save as Current',2000);
-    toast('Current saved — click ↩ Current to restore');
   });
 
   // Glow
