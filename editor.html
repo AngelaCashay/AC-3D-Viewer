@@ -587,8 +587,67 @@ function resetAllControls() {
   G('tHt').classList.remove('on');
 }
 
+let currentSnapshot = null;
+
+function takeSnapshot() {
+  currentSnapshot = gather();
+}
+
+function restoreSnapshot() {
+  if(!currentSnapshot) return;
+  const s = currentSnapshot;
+  // Background
+  const c=h2c('#'+s.bg); scene.clearColor=new BABYLON.Color4(c.r,c.g,c.b,1); G('cBg').value='#'+s.bg;
+  // Exposure/contrast/sat
+  pipe.imageProcessing.exposure=parseFloat(s.exp); G('sEx').value=s.exp; G('vEx').textContent=parseFloat(s.exp).toFixed(2);
+  pipe.imageProcessing.contrast=parseFloat(s.contrast); G('sCo').value=s.contrast; G('vCo').textContent=parseFloat(s.contrast).toFixed(2);
+  const sa=parseFloat(s.sat);
+  G('sSa').value=sa; G('vSa').textContent=sa.toFixed(2);
+  if(!pipe.imageProcessing.colorCurves) pipe.imageProcessing.colorCurves=new BABYLON.ColorCurves();
+  pipe.imageProcessing.colorCurvesEnabled=true;
+  pipe.imageProcessing.colorCurves.globalSaturation=(sa-1)*100;
+  // Glow
+  const gOn=s.glowOn==='1'||s.glowOn===1;
+  gOn?G('tG').classList.add('on'):G('tG').classList.remove('on');
+  glow.intensity=gOn?parseFloat(s.glowInt):0;
+  G('sGI').value=s.glowInt; G('vGI').textContent=parseFloat(s.glowInt).toFixed(2);
+  G('sGB').value=s.glowBlur; G('vGB').textContent=s.glowBlur;
+  G('cG').value='#'+s.glowCol;
+  // Key light
+  dir.intensity=parseFloat(s.keyInt); dir.diffuse=h2c('#'+s.keyCol);
+  G('sKI').value=s.keyInt; G('vKI').textContent=parseFloat(s.keyInt).toFixed(2); G('cK').value='#'+s.keyCol;
+  dir.direction=new BABYLON.Vector3(parseFloat(s.keyX),parseFloat(s.keyY),parseFloat(s.keyZ));
+  G('sKX').value=s.keyX; G('vKX').textContent=parseFloat(s.keyX).toFixed(2);
+  G('sKY').value=s.keyY; G('vKY').textContent=parseFloat(s.keyY).toFixed(2);
+  G('sKZ').value=s.keyZ; G('vKZ').textContent=parseFloat(s.keyZ).toFixed(2);
+  // Ambient
+  hemi.intensity=parseFloat(s.ambInt); hemi.diffuse=h2c('#'+s.ambCol);
+  G('sAI').value=s.ambInt; G('vAI').textContent=parseFloat(s.ambInt).toFixed(2); G('cA').value='#'+s.ambCol;
+  // Fill
+  fill.intensity=parseFloat(s.fillInt); fill.diffuse=h2c('#'+s.fillCol);
+  G('sFI').value=s.fillInt; G('vFI').textContent=parseFloat(s.fillInt).toFixed(2); G('cF').value='#'+s.fillCol;
+  // Bloom
+  const blOn=s.bloom==='1'||s.bloom===1;
+  pipe.bloomEnabled=blOn; blOn?G('tBl').classList.add('on'):G('tBl').classList.remove('on');
+  pipe.bloomIntensity=parseFloat(s.bloomInt); G('sBI').value=s.bloomInt; G('vBI').textContent=parseFloat(s.bloomInt).toFixed(2);
+  // DOF
+  const dfOn=s.dof==='1'||s.dof===1;
+  pipe.depthOfFieldEnabled=dfOn; dfOn?G('tDf').classList.add('on'):G('tDf').classList.remove('on');
+  // Wireframe
+  wire=s.wire==='1'||s.wire===1;
+  wire?G('tWf').classList.add('on'):G('tWf').classList.remove('on'); applyWire();
+  // Auto rotate
+  autoRot=s.rotate==='1'||s.rotate===1;
+  autoRot?G('tRt').classList.add('on'):G('tRt').classList.remove('on');
+}
+
 function applyPreset(n) {
-  if(n==='current') return;
+  if(n==='current') {
+    restoreSnapshot();
+    return;
+  }
+  // Snapshot current state before overwriting
+  takeSnapshot();
   const p=PRESETS[n]; if(!p) return;
 
   // Full reset first so no state bleeds from previous preset
