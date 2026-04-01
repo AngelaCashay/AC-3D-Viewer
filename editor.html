@@ -235,6 +235,17 @@
       <div class="tr"><span class="tn">Wireframe</span><div class="tg" id="tWf"></div></div>
       <div class="tr"><span class="tn">Bounding Box</span><div class="tg" id="tBb"></div></div>
     </div>
+
+    <div class="ps">
+      <div class="sl">Shadows</div>
+      <div class="tr"><span class="tn">Self Shadow</span><div class="tg" id="tShSelf"></div></div>
+      <div class="tr"><span class="tn">Ground Shadow</span><div class="tg" id="tShGnd"></div></div>
+      <div class="tr"><span class="tn">From Key Light</span><div class="tg on" id="tShKey"></div></div>
+      <div class="tr"><span class="tn">From Fill Light</span><div class="tg" id="tShFill"></div></div>
+      <div class="cr"><div class="cl"><span class="cn">Intensity</span><span class="cv" id="vShInt">0.50</span></div><input type="range" id="sShInt" min="0" max="1" step="0.01" value="0.5"/></div>
+      <div class="cr"><div class="cl"><span class="cn">Softness</span><span class="cv" id="vShBlur">2</span></div><input type="range" id="sShBlur" min="0" max="64" step="1" value="2"/></div>
+      <div class="cr"><div class="cl"><span class="cn">Ground Height</span><span class="cv" id="vShH">0.00</span></div><input type="range" id="sShH" min="-10" max="10" step="0.1" value="0"/></div>
+    </div>
   </div>
 
   <div id="sb">
@@ -251,6 +262,7 @@ const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer:true, ste
 let scene, cam, glow, pipe, hemi, dir, fill, fill2;
 let meshes=[], wire=false, autoRot=false, f2on=false;
 let htPass=null, htOn=false;
+let shadowGenKey=null, shadowGenFill=null, groundMesh=null;
 
 const HT_SHADER = `
   precision highp float;
@@ -464,6 +476,7 @@ function loadGLB(file) {
     meshes=ms;
     frameCamera();
     applyWire();
+    if(shadowGenKey||shadowGenFill) addMeshesToShadow();
     G('ld').classList.remove('v');
     G('dz').classList.add('h');
     G('fnt').textContent=file.name;
@@ -484,6 +497,98 @@ function frameCamera() {
 }
 
 function applyWire() { meshes.forEach(m=>{if(m.material) m.material.wireframe=wire}); }
+
+function getShadowBlur() { return parseFloat(G('sShBlur').value); }
+function getShadowInt() { return parseFloat(G('sShInt').value); }
+
+function createShadowGen(light) {
+  const gen = new BABYLON.ShadowGenerator(1024, light);
+  gen.useBlurExponentialShadowMap = true;
+  gen.blurKernel = getShadowBlur();
+  gen.darkness = 1 - getShadowInt();
+  return gen;
+}
+
+function addMeshesToShadow() {
+  [shadowGenKey, shadowGenFill].forEach(gen => {
+    if(!gen) return;
+    gen.getShadowMap().renderList = [];
+    meshes.forEach(m => { try { gen.addShadowCaster(m, true); } catch(e){} });
+  });
+}
+
+function enableSelfShadow(on) {
+  meshes.forEach(m => { try { if(on) m.receiveShadows=true; else m.receiveShadows=false; } catch(e){} });
+}
+
+function createGroundMesh() {
+  destroyGroundMesh();
+  const bounds = scene.getWorldExtends();
+  const size = Math.max(
+    bounds.max.x - bounds.min.x,
+    bounds.max.z - bounds.min.z
+  ) * 3;
+  groundMesh = BABYLON.MeshBuilder.CreateGround('shadowGround', {width:size, height:size}, scene);
+  groundMesh.position.y = parseFloat(G('sShH').value);
+  const mat = new BABYLON.ShadowOnlyMaterial('groundMat', scene);
+  mat.activeLight = shadowGenKey ? dir : fill;
+  mat.alpha = getShadowInt();
+  groundMesh.material = mat;
+  groundMesh.receiveShadows = true;
+  [shadowGenKey, shadowGenFill].forEach(gen => { if(gen) gen.addShadowCaster(groundMesh); });
+}
+
+function destroyGroundMesh() {
+  if(groundMesh) { groundMesh.dispose(); groundMesh = null; }
+}
+
+function destroyShadows() {
+  if(shadowGenKey) { shadowGenKey.dispose(); shadowGenKey = null; }
+  if(shadowGenFill) { shadowGenFill.dispose(); shadowGenFill = null; }
+  destroyGroundMesh();
+  meshes.forEach(m => { try { m.receiveShadows = false; } catch(e){} });
+}
+
+function updateShadows() {
+  const selfOn = tog('tShSelf');
+  const gndOn = tog('tShGnd');
+  const keyOn = tog('tShKey');
+  const fillOn = tog('tShFill');
+  const blur = getShadowBlur();
+  const dark = 1 - getShadowInt();
+
+  // Key shadow generator
+  if(keyOn && !shadowGenKey) {
+    shadowGenKey = createShadowGen(dir);
+    addMeshesToShadow();
+  } else if(!keyOn && shadowGenKey) {
+    shadowGenKey.dispose(); shadowGenKey = null;
+  }
+  if(shadowGenKey) { shadowGenKey.blurKernel = blur; shadowGenKey.darkness = dark; }
+
+  // Fill shadow generator
+  if(fillOn && !shadowGenFill) {
+    shadowGenFill = createShadowGen(fill);
+    addMeshesToShadow();
+  } else if(!fillOn && shadowGenFill) {
+    shadowGenFill.dispose(); shadowGenFill = null;
+  }
+  if(shadowGenFill) { shadowGenFill.blurKernel = blur; shadowGenFill.darkness = dark; }
+
+  // Self shadow
+  enableSelfShadow(selfOn);
+
+  // Ground shadow
+  if(gndOn && (keyOn || fillOn)) {
+    if(!groundMesh) createGroundMesh();
+    else {
+      groundMesh.position.y = parseFloat(G('sShH').value);
+      if(groundMesh.material) groundMesh.material.alpha = getShadowInt();
+    }
+  } else if(!gndOn) {
+    destroyGroundMesh();
+  }
+}
 
 function sld(sid,vid,dec,fn) {
   const s=G(sid),v=G(vid);
@@ -586,6 +691,12 @@ function resetAllControls() {
   // Halftone
   if(htOn){ destroyHalftone(); htOn=false; }
   G('tHt').classList.remove('on');
+  // Shadows
+  destroyShadows();
+  G('tShSelf').classList.remove('on'); G('tShGnd').classList.remove('on');
+  G('tShKey').classList.add('on'); G('tShFill').classList.remove('on');
+  G('sShInt').value=0.5; G('vShInt').textContent='0.50';
+  G('sShBlur').value=2; G('vShBlur').textContent='2';
 }
 
 let currentSnapshot = null;
@@ -710,6 +821,9 @@ function gather() {
     fov: G('sFv').value,
     rotate: tog('tRt')?1:0, rotSpd: G('sRS').value, rotDir: G('sRD').value,
     wire: tog('tWf')?1:0,
+    shSelf: tog('tShSelf')?1:0, shGnd: tog('tShGnd')?1:0,
+    shKey: tog('tShKey')?1:0, shFill: tog('tShFill')?1:0,
+    shInt: G('sShInt').value, shBlur: G('sShBlur').value, shH: G('sShH').value,
     ht: tog('tHt')?1:0, htSize: G('sHt').value, htAngle: G('sHtA').value,
     htContrast: G('sHtC').value, htColor: G('cHt').value.replace('#',''),
     htPattern: G('sHtP').value, htColorMode: tog('tHtC')?1:0, htGlbOnly: tog('tHtG')?1:0,
@@ -859,6 +973,16 @@ function bind() {
 
   // Bounding box
   G('tBb').addEventListener('click',()=>{G('tBb').classList.toggle('on');const on=tog('tBb');meshes.forEach(m=>{try{m.showBoundingBox=on}catch(e){}})});
+
+  // Shadows
+  ['tShSelf','tShGnd','tShKey','tShFill'].forEach(id=>{
+    G(id).addEventListener('click',()=>{ G(id).classList.toggle('on'); updateShadows(); });
+  });
+  sld('sShInt','vShInt',2,()=>updateShadows());
+  sld('sShBlur','vShBlur',0,()=>updateShadows());
+  sld('sShH','vShH',2,v=>{
+    if(groundMesh) groundMesh.position.y=v;
+  });
 
   // Halftone
   G('tHt').addEventListener('click',()=>{

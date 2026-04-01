@@ -239,6 +239,42 @@ function init(){
         };
       }
     }
+    // Apply shadows if enabled
+    const shKeyOn=p.get('shKey')==='1';
+    const shFillOn=p.get('shFill')==='1';
+    const shSelfOn=p.get('shSelf')==='1';
+    const shGndOn=p.get('shGnd')==='1';
+    const shInt=parseFloat(p.get('shInt')||0.5);
+    const shBlur=parseFloat(p.get('shBlur')||2);
+    const shH=parseFloat(p.get('shH')||0);
+    const dark=1-shInt;
+
+    let shGenKey=null, shGenFill=null;
+    if(shKeyOn){
+      shGenKey=new BABYLON.ShadowGenerator(1024,dir);
+      shGenKey.useBlurExponentialShadowMap=true;
+      shGenKey.blurKernel=shBlur; shGenKey.darkness=dark;
+      ms.forEach(m=>{try{shGenKey.addShadowCaster(m,true);}catch(e){}});
+    }
+    if(shFillOn){
+      shGenFill=new BABYLON.ShadowGenerator(1024,fill);
+      shGenFill.useBlurExponentialShadowMap=true;
+      shGenFill.blurKernel=shBlur; shGenFill.darkness=dark;
+      ms.forEach(m=>{try{shGenFill.addShadowCaster(m,true);}catch(e){}});
+    }
+    if(shSelfOn) ms.forEach(m=>{try{m.receiveShadows=true;}catch(e){}});
+    if(shGndOn&&(shKeyOn||shFillOn)){
+      const bounds=scene.getWorldExtends();
+      const sz=Math.max(bounds.max.x-bounds.min.x,bounds.max.z-bounds.min.z)*3;
+      const gnd=BABYLON.MeshBuilder.CreateGround('sg',{width:sz,height:sz},scene);
+      gnd.position.y=shH;
+      const mat=new BABYLON.ShadowOnlyMaterial('sgm',scene);
+      mat.activeLight=shKeyOn?dir:fill;
+      mat.alpha=shInt;
+      gnd.material=mat; gnd.receiveShadows=true;
+      if(shGenKey) shGenKey.addShadowCaster(gnd);
+      if(shGenFill) shGenFill.addShadowCaster(gnd);
+    }
     G('ld').classList.add('h');
   },null,(sc,msg)=>{
     console.error(msg);
