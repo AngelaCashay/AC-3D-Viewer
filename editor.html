@@ -7,6 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/babylonjs@7.0.0/babylon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/babylonjs-loaders@7.0.0/babylonjs.loaders.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/babylonjs-inspector@7.0.0/babylon.inspector.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babylonjs-materials@7.0.0/babylonjs.materials.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap');
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -502,18 +503,24 @@ function getShadowBlur() { return parseFloat(G('sShBlur').value); }
 function getShadowInt() { return parseFloat(G('sShInt').value); }
 
 function createShadowGen(light) {
-  const gen = new BABYLON.ShadowGenerator(1024, light);
+  const gen = new BABYLON.ShadowGenerator(2048, light);
   gen.useBlurExponentialShadowMap = true;
   gen.blurKernel = getShadowBlur();
   gen.darkness = 1 - getShadowInt();
+  gen.transparencyShadow = true;
   return gen;
 }
 
 function addMeshesToShadow() {
   [shadowGenKey, shadowGenFill, shadowGenFill2].forEach(gen => {
     if(!gen) return;
-    gen.getShadowMap().renderList = [];
-    meshes.forEach(m => { try { gen.addShadowCaster(m, true); } catch(e){} });
+    meshes.forEach(m => {
+      try {
+        gen.addShadowCaster(m, true);
+        // Also make ground receive shadows
+        if(groundMesh) groundMesh.receiveShadows = true;
+      } catch(e){}
+    });
   });
 }
 
@@ -533,37 +540,16 @@ function createGroundMesh() {
   const size = Math.max(
     bounds.max.x - bounds.min.x,
     bounds.max.z - bounds.min.z
-  ) * 3;
-  groundMesh = BABYLON.MeshBuilder.CreateGround('shadowGround', {width:size, height:size}, scene);
+  ) * 4;
+  groundMesh = BABYLON.MeshBuilder.CreateGround('shadowGround', {width:size, height:size, subdivisions:1}, scene);
   groundMesh.position.y = parseFloat(G('sShH').value);
-
-  // Use standard material with shadow darkening via alpha
-  const mat = new BABYLON.StandardMaterial('groundMat', scene);
-  mat.diffuseColor = new BABYLON.Color3(0,0,0);
-  mat.specularColor = new BABYLON.Color3(0,0,0);
-  mat.alpha = 0; // Fully transparent base
-  mat.backFaceCulling = false;
-  groundMesh.material = mat;
   groundMesh.receiveShadows = true;
 
-  // Try ShadowOnlyMaterial first, fall back if not available
-  try {
-    const shadowMat = new BABYLON.ShadowOnlyMaterial('shadowOnly', scene);
-    shadowMat.shadowColor = new BABYLON.Color3(0,0,0);
-    shadowMat.alpha = getShadowInt();
-    groundMesh.material = shadowMat;
-  } catch(e) {
-    // Fallback: semi-transparent dark material
-    const fallbackMat = new BABYLON.StandardMaterial('groundFallback', scene);
-    fallbackMat.diffuseColor = new BABYLON.Color3(0,0,0);
-    fallbackMat.alpha = getShadowInt() * 0.5;
-    fallbackMat.backFaceCulling = false;
-    groundMesh.material = fallbackMat;
-  }
-
-  [shadowGenKey, shadowGenFill].forEach(gen => {
-    if(gen) gen.addShadowCaster(groundMesh);
-  });
+  // ShadowOnlyMaterial — renders only shadow, fully transparent otherwise
+  const mat = new BABYLON.ShadowOnlyMaterial('groundMat', scene);
+  mat.shadowColor = new BABYLON.Color3(0, 0, 0);
+  mat.alpha = getShadowInt();
+  groundMesh.material = mat;
 }
 
 function destroyGroundMesh() {
