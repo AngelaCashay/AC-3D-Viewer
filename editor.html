@@ -262,7 +262,7 @@ const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer:true, ste
 let scene, cam, glow, pipe, hemi, dir, fill, fill2;
 let meshes=[], wire=false, autoRot=false, f2on=false;
 let htPass=null, htOn=false;
-let shadowGenKey=null, shadowGenFill=null, groundMesh=null;
+let shadowGenKey=null, shadowGenFill=null, shadowGenFill2=null, groundMesh=null;
 
 const HT_SHADER = `
   precision highp float;
@@ -476,7 +476,7 @@ function loadGLB(file) {
     meshes=ms;
     frameCamera();
     applyWire();
-    if(shadowGenKey||shadowGenFill) addMeshesToShadow();
+    if(shadowGenKey||shadowGenFill||shadowGenFill2) addMeshesToShadow();
     G('ld').classList.remove('v');
     G('dz').classList.add('h');
     G('fnt').textContent=file.name;
@@ -510,7 +510,7 @@ function createShadowGen(light) {
 }
 
 function addMeshesToShadow() {
-  [shadowGenKey, shadowGenFill].forEach(gen => {
+  [shadowGenKey, shadowGenFill, shadowGenFill2].forEach(gen => {
     if(!gen) return;
     gen.getShadowMap().renderList = [];
     meshes.forEach(m => { try { gen.addShadowCaster(m, true); } catch(e){} });
@@ -518,11 +518,17 @@ function addMeshesToShadow() {
 }
 
 function enableSelfShadow(on) {
-  meshes.forEach(m => { try { if(on) m.receiveShadows=true; else m.receiveShadows=false; } catch(e){} });
+  meshes.forEach(m => {
+    try {
+      m.receiveShadows = on;
+      if(m.material) m.material.needDepthPrePass = on;
+    } catch(e){}
+  });
 }
 
 function createGroundMesh() {
   destroyGroundMesh();
+  if(!meshes.length) return;
   const bounds = scene.getWorldExtends();
   const size = Math.max(
     bounds.max.x - bounds.min.x,
@@ -530,12 +536,34 @@ function createGroundMesh() {
   ) * 3;
   groundMesh = BABYLON.MeshBuilder.CreateGround('shadowGround', {width:size, height:size}, scene);
   groundMesh.position.y = parseFloat(G('sShH').value);
-  const mat = new BABYLON.ShadowOnlyMaterial('groundMat', scene);
-  mat.activeLight = shadowGenKey ? dir : fill;
-  mat.alpha = getShadowInt();
+
+  // Use standard material with shadow darkening via alpha
+  const mat = new BABYLON.StandardMaterial('groundMat', scene);
+  mat.diffuseColor = new BABYLON.Color3(0,0,0);
+  mat.specularColor = new BABYLON.Color3(0,0,0);
+  mat.alpha = 0; // Fully transparent base
+  mat.backFaceCulling = false;
   groundMesh.material = mat;
   groundMesh.receiveShadows = true;
-  [shadowGenKey, shadowGenFill].forEach(gen => { if(gen) gen.addShadowCaster(groundMesh); });
+
+  // Try ShadowOnlyMaterial first, fall back if not available
+  try {
+    const shadowMat = new BABYLON.ShadowOnlyMaterial('shadowOnly', scene);
+    shadowMat.shadowColor = new BABYLON.Color3(0,0,0);
+    shadowMat.alpha = getShadowInt();
+    groundMesh.material = shadowMat;
+  } catch(e) {
+    // Fallback: semi-transparent dark material
+    const fallbackMat = new BABYLON.StandardMaterial('groundFallback', scene);
+    fallbackMat.diffuseColor = new BABYLON.Color3(0,0,0);
+    fallbackMat.alpha = getShadowInt() * 0.5;
+    fallbackMat.backFaceCulling = false;
+    groundMesh.material = fallbackMat;
+  }
+
+  [shadowGenKey, shadowGenFill].forEach(gen => {
+    if(gen) gen.addShadowCaster(groundMesh);
+  });
 }
 
 function destroyGroundMesh() {
@@ -545,6 +573,7 @@ function destroyGroundMesh() {
 function destroyShadows() {
   if(shadowGenKey) { shadowGenKey.dispose(); shadowGenKey = null; }
   if(shadowGenFill) { shadowGenFill.dispose(); shadowGenFill = null; }
+  if(shadowGenFill2) { shadowGenFill2.dispose(); shadowGenFill2 = null; }
   destroyGroundMesh();
   meshes.forEach(m => { try { m.receiveShadows = false; } catch(e){} });
 }
@@ -566,7 +595,7 @@ function updateShadows() {
   }
   if(shadowGenKey) { shadowGenKey.blurKernel = blur; shadowGenKey.darkness = dark; }
 
-  // Fill shadow generator
+  // Fill shadow generator — covers both fill light 1 and fill light 2
   if(fillOn && !shadowGenFill) {
     shadowGenFill = createShadowGen(fill);
     addMeshesToShadow();
@@ -574,6 +603,15 @@ function updateShadows() {
     shadowGenFill.dispose(); shadowGenFill = null;
   }
   if(shadowGenFill) { shadowGenFill.blurKernel = blur; shadowGenFill.darkness = dark; }
+
+  // Fill light 2 shadow — shares same toggle as fill light 1
+  if(fillOn && f2on && !shadowGenFill2) {
+    shadowGenFill2 = createShadowGen(fill2);
+    addMeshesToShadow();
+  } else if((!fillOn || !f2on) && shadowGenFill2) {
+    shadowGenFill2.dispose(); shadowGenFill2 = null;
+  }
+  if(shadowGenFill2) { shadowGenFill2.blurKernel = blur; shadowGenFill2.darkness = dark; }
 
   // Self shadow
   enableSelfShadow(selfOn);

@@ -268,10 +268,19 @@ function init(){
       const sz=Math.max(bounds.max.x-bounds.min.x,bounds.max.z-bounds.min.z)*3;
       const gnd=BABYLON.MeshBuilder.CreateGround('sg',{width:sz,height:sz},scene);
       gnd.position.y=shH;
-      const mat=new BABYLON.ShadowOnlyMaterial('sgm',scene);
-      mat.activeLight=shKeyOn?dir:fill;
-      mat.alpha=shInt;
-      gnd.material=mat; gnd.receiveShadows=true;
+      gnd.receiveShadows=true;
+      try {
+        const mat=new BABYLON.ShadowOnlyMaterial('sgm',scene);
+        mat.shadowColor=new BABYLON.Color3(0,0,0);
+        mat.alpha=shInt;
+        gnd.material=mat;
+      } catch(e) {
+        const mat=new BABYLON.StandardMaterial('sgm',scene);
+        mat.diffuseColor=new BABYLON.Color3(0,0,0);
+        mat.alpha=shInt*0.5;
+        mat.backFaceCulling=false;
+        gnd.material=mat;
+      }
       if(shGenKey) shGenKey.addShadowCaster(gnd);
       if(shGenFill) shGenFill.addShadowCaster(gnd);
     }
