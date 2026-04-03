@@ -545,10 +545,11 @@ function createGroundMesh() {
   groundMesh.position.y = parseFloat(G('sShH').value);
   groundMesh.receiveShadows = true;
 
-  // ShadowOnlyMaterial — renders only shadow, fully transparent otherwise
   const mat = new BABYLON.ShadowOnlyMaterial('groundMat', scene);
   mat.shadowColor = new BABYLON.Color3(0, 0, 0);
   mat.alpha = getShadowInt();
+  // Set active light — required for ShadowOnlyMaterial to render the shadow
+  mat.activeLight = shadowGenKey ? dir : fill;
   groundMesh.material = mat;
 }
 

@@ -273,6 +273,7 @@ function init(){
       const mat=new BABYLON.ShadowOnlyMaterial('sgm',scene);
       mat.shadowColor=new BABYLON.Color3(0,0,0);
       mat.alpha=shInt;
+      mat.activeLight=shKeyOn?dir:fill;
       gnd.material=mat;
     }
     G('ld').classList.add('h');
