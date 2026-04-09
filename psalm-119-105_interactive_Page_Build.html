@@ -85,16 +85,16 @@
     .section-divider{height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);}
 
     /* Renders */
-    .renders-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;cursor:grab;}
-    .renders-strip:active{cursor:grabbing}
-    .renders-strip::-webkit-scrollbar{height:2px}
-    .renders-strip::-webkit-scrollbar-thumb{background:var(--accent-mid);border-radius:1px}
+    .renders-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .renders-strip::-webkit-scrollbar{display:none;}
     .render-card{flex-shrink:0;width:280px;aspect-ratio:4/5;border-radius:2px;overflow:hidden;scroll-snap-align:start;border:1px solid var(--border);transition:border-color 0.3s,transform 0.3s;cursor:pointer;}
     .render-card:hover{border-color:var(--accent-mid);transform:scale(1.02)}
     .render-card img{width:100%;height:100%;object-fit:cover;display:block}
-    .renders-hint{margin-top:14px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:8px;}
-    .renders-hint::before{content:'←';opacity:0.5}
-    .renders-hint::after{content:'→';opacity:0.5}
+    .renders-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;}
+    .renders-nav-btn{background:transparent;border:1px solid var(--border);color:var(--text-mid);font-family:'Jost',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;padding:8px 20px;border-radius:2px;cursor:pointer;transition:all 0.2s;}
+    .renders-nav-btn:hover{border-color:var(--accent-mid);color:var(--accent);background:var(--accent-dim)}
+    .renders-nav-btn:disabled{opacity:0.25;cursor:not-allowed;}
+    .renders-nav-counter{font-size:10px;letter-spacing:0.18em;color:var(--text-mid);min-width:40px;text-align:center;}
 
     /* Lazy iframe wrapper */
     .lazy-frame-wrap{position:relative;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
@@ -159,11 +159,16 @@
     .viewer-hint-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);opacity:0.9;font-weight:400;}
     .viewer-hint-row span{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-mid);}
     .viewer-disclaimer{
-      margin-top:14px;
+      margin-top:16px;
       font-family:'Cormorant Garamond',serif;
-      font-size:13px;font-style:italic;font-weight:300;
-      color:var(--text-muted);text-align:center;line-height:1.6;
-      max-width:560px;margin-left:auto;margin-right:auto;
+      font-size:15px;font-style:italic;font-weight:300;
+      color:var(--text-mid);
+      text-align:center;line-height:1.75;
+      max-width:600px;margin-left:auto;margin-right:auto;
+      border:1px solid var(--border);
+      border-radius:2px;
+      padding:14px 20px;
+      background:var(--surface);
     }
 
     /* Scripture cards */
@@ -297,7 +302,11 @@
         <img src="https://pub-3e7d870fab6147e5814d59675bd67072.r2.dev/Psalm_119_105_Feather_Front_Top_Alpha.png" alt="Psalm 119:105 — Wide Scene" loading="lazy">
       </div>
     </div>
-    <div class="renders-hint">Drag to explore</div>
+    <div class="renders-nav">
+      <button class="renders-nav-btn" id="renders-prev" disabled>← Prev</button>
+      <span class="renders-nav-counter" id="renders-counter">1 / 5</span>
+      <button class="renders-nav-btn" id="renders-next">Next →</button>
+    </div>
   </div>
 </section>
 
@@ -386,7 +395,9 @@
         <span>Drag to orbit · Scroll to zoom · Right-drag to pan</span>
       </div>
       <div class="viewer-creator-hint">If you get lost in the scene, tap <strong>↩ Creator View</strong> to return to the original perspective.</div>
-      <div class="viewer-disclaimer">For the richest experience with full lighting, shadows, and visual effects, the 3D viewer is best explored on desktop.</div>
+      <div class="viewer-disclaimer">
+        My personalized 3D viewer with full lighting, shadows, glow, and visual effects is only available on desktop. Mobile visitors will experience a shadeless version of the illustration optimized for mobile viewing.
+      </div>
     </div>
   </div>
 </section>
@@ -615,20 +626,25 @@ const sectionObserver = new IntersectionObserver(entries => {
 }, {threshold:0.3, rootMargin:'-52px 0px 0px 0px'});
 sections.forEach(id => { const el=document.getElementById(id); if(el) sectionObserver.observe(el); });
 
-// ── Renders strip — mouse drag (desktop) + touch swipe (mobile) ──
+// ── Renders strip — prev/next buttons ──
 const strip = document.getElementById('renders-strip');
-let isDown=false, startX, scrollLeft;
-// Mouse drag for desktop
-strip.addEventListener('mousedown', e=>{isDown=true;strip.style.cursor='grabbing';startX=e.pageX-strip.offsetLeft;scrollLeft=strip.scrollLeft});
-strip.addEventListener('mouseleave', ()=>{isDown=false;strip.style.cursor='grab'});
-strip.addEventListener('mouseup', ()=>{isDown=false;strip.style.cursor='grab'});
-strip.addEventListener('mousemove', e=>{if(!isDown)return;e.preventDefault();const x=e.pageX-strip.offsetLeft;strip.scrollLeft=scrollLeft-(x-startX)*1.5});
-// Touch swipe for mobile — native scroll handles it, just prevent vertical interference
-strip.addEventListener('touchstart', e=>{startX=e.touches[0].clientX; scrollLeft=strip.scrollLeft;},{passive:true});
-strip.addEventListener('touchmove', e=>{
-  const dx = startX - e.touches[0].clientX;
-  strip.scrollLeft = scrollLeft + dx;
-},{passive:true});
+const renderCards = strip ? strip.querySelectorAll('.render-card') : [];
+const renderPrev = document.getElementById('renders-prev');
+const renderNext = document.getElementById('renders-next');
+const renderCounter = document.getElementById('renders-counter');
+let renderIndex = 0;
+
+function scrollToRender(index) {
+  if(!strip || !renderCards.length) return;
+  renderIndex = Math.max(0, Math.min(index, renderCards.length - 1));
+  renderCards[renderIndex].scrollIntoView({behavior:'smooth', block:'nearest', inline:'start'});
+  if(renderPrev) renderPrev.disabled = renderIndex === 0;
+  if(renderNext) renderNext.disabled = renderIndex === renderCards.length - 1;
+  if(renderCounter) renderCounter.textContent = `${renderIndex + 1} / ${renderCards.length}`;
+}
+
+if(renderPrev) renderPrev.addEventListener('click', () => scrollToRender(renderIndex - 1));
+if(renderNext) renderNext.addEventListener('click', () => scrollToRender(renderIndex + 1));
 
 // ── Scripture cards ──
 let cur=0;
