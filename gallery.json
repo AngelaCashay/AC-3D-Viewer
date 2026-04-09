@@ -1,0 +1,18 @@
+{
+  "artist": {
+    "name": "Angela Cashay",
+    "tagline": "Keep Creating · Creative Faith",
+    "url": "https://www.angelacashay.com"
+  },
+  "works": [
+    {
+      "id": "psalm-119-105",
+      "title": "Psalm 119:105",
+      "scripture": "Your word is a lamp to my feet and a light to my path.",
+      "reference": "Psalm 119:105",
+      "model": "Psalm-119_105_04072026-NoLightmap.glb",
+      "shareParams": "glowOn=1&glowInt=0.16&glowBlur=64&glowCol=a259ff&emOn=0&emCol=c9a96e&emStr=0.96&bg=01020a&exp=0.71&contrast=1.53&sat=1.52&tone=0&keyInt=0.5&keyCol=ff66cc&keyX=-0.72&keyY=-2.41&keyZ=-0.64&spec=1&ambInt=0.4&ambCol=be38f3&groundCol=9929bd&fillInt=0.85&fillCol=d357fe&fillX=8&fillY=0.6&fillZ=-0.2&fill2On=1&fill2Int=0.2&fill2Col=ffccaa&fill2X=-0.2&fill2Y=-0.8&fill2Z=0.3&bloom=1&bloomInt=1.2&bloomThresh=0.3&bloomKernel=64&dof=0&dofDist=10&dofAp=0.05&dofFocal=50&vig=0&vigInt=0.5&vigCol=000000&grain=0&grainInt=0&chrom=1&sharp=0&fov=0.8&rotate=0&rotSpd=0.005&rotDir=1&wire=0&shSelf=1&shGnd=1&shKey=1&shFill=1&shInt=0.67&shBlur=2&shH=0.2&ht=0&htSize=4&htAngle=0&htContrast=1&htColor=000000&htPattern=0&htColorMode=0&htGlbOnly=0&camAlpha=0.7555&camBeta=1.7583&camRadius=20.2189&camTX=6.3806&camTY=6.7917&camTZ=4.1609",
+      "featured": true
+    }
+  ]
+}

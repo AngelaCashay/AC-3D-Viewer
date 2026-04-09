@@ -115,8 +115,62 @@
     .rive-wrap{width:100%;max-width:540px;margin:0 auto;aspect-ratio:4/5;}
     .rive-note{text-align:center;margin-top:16px;font-size:11px;letter-spacing:0.12em;color:var(--text-muted);font-style:italic;font-family:'Cormorant Garamond',serif;}
 
-    /* Viewer */
-    .viewer-outer{width:100%;height:72vh;min-height:520px;}
+    /* Viewer preview card */
+    .viewer-outer{width:100%;}
+    .viewer-preview{
+      display:block;
+      width:100%;
+      position:relative;
+      border-radius:3px;
+      overflow:hidden;
+      border:2px solid var(--blue);
+      box-shadow:0 0 0 0 rgba(67,180,255,0);
+      transition:border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .viewer-preview:hover{
+      border-color:#43B4FF;
+      box-shadow:0 0 24px rgba(67,180,255,0.25), 0 0 48px rgba(67,180,255,0.1);
+      transform:scale(1.005);
+    }
+    .viewer-preview-img{
+      width:100%;display:block;
+      aspect-ratio:16/9;object-fit:cover;
+    }
+    .viewer-preview-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(to top, rgba(0,3,51,0.75) 0%, rgba(0,3,51,0.2) 50%, transparent 100%);
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:10px;
+      transition:background 0.3s;
+    }
+    .viewer-preview:hover .viewer-preview-overlay{
+      background:linear-gradient(to top, rgba(0,3,51,0.85) 0%, rgba(0,3,51,0.35) 50%, transparent 100%);
+    }
+    .viewer-preview-btn{
+      display:flex;align-items:center;gap:10px;
+      background:rgba(0,3,51,0.7);
+      border:1px solid rgba(67,180,255,0.6);
+      color:#43B4FF;
+      font-family:'Jost',sans-serif;font-size:11px;font-weight:400;
+      letter-spacing:0.26em;text-transform:uppercase;
+      padding:13px 28px;border-radius:2px;
+      transition:all 0.2s;
+      backdrop-filter:blur(8px);
+    }
+    .viewer-preview:hover .viewer-preview-btn{
+      background:rgba(67,180,255,0.15);
+      border-color:rgba(67,180,255,0.9);
+      box-shadow:0 0 16px rgba(67,180,255,0.2);
+    }
+    .viewer-preview-icon{font-size:14px;opacity:0.8}
+    .viewer-preview-arrow{font-size:14px}
+    .viewer-preview-hint{
+      font-size:9px;letter-spacing:0.22em;text-transform:uppercase;
+      color:rgba(255,255,255,0.4);
+    }
     .viewer-hints{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px;}
     .viewer-hint-row{display:flex;align-items:center;gap:10px;}
     .viewer-hint-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);opacity:0.9;font-weight:400;}
@@ -303,37 +357,30 @@
       <p class="section-desc">This scene was drawn using Feather 3D. I invite you to explore the full 3D drawing.</p>
     </div>
     <div class="viewer-outer">
-      <div class="lazy-frame-wrap" id="viewer-wrap-inner" style="height:100%;">
-        <div class="frame-loader" id="viewer-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-label">Loading 3D Scene</div>
+      <a
+        href="https://angelacashay.github.io/AC-3D-Viewer/viewer.html?model=Psalm-119_105_04072026-NoLightmap.glb&glowOn=1&glowInt=0.16&glowBlur=64&glowCol=a259ff&emOn=0&emCol=c9a96e&emStr=0.96&bg=01020a&exp=0.71&contrast=1.53&sat=1.52&tone=0&keyInt=0.5&keyCol=ff66cc&keyX=-0.72&keyY=-2.41&keyZ=-0.64&spec=1&ambInt=0.4&ambCol=be38f3&groundCol=9929bd&fillInt=0.85&fillCol=d357fe&fillX=8&fillY=0.6&fillZ=-0.2&fill2On=1&fill2Int=0.2&fill2Col=ffccaa&fill2X=-0.2&fill2Y=-0.8&fill2Z=0.3&bloom=1&bloomInt=1.2&bloomThresh=0.3&bloomKernel=64&dof=0&dofDist=10&dofAp=0.05&dofFocal=50&vig=0&vigInt=0.5&vigCol=000000&grain=0&grainInt=0&chrom=1&sharp=0&fov=0.8&rotate=0&rotSpd=0.005&rotDir=1&wire=0&shSelf=1&shGnd=1&shKey=1&shFill=1&shInt=0.67&shBlur=2&shH=0.2&ht=0&htSize=4&htAngle=0&htContrast=1&htColor=000000&htPattern=0&htColorMode=0&htGlbOnly=0&camAlpha=0.7555&camBeta=1.7583&camRadius=20.2189&camTX=6.3806&camTY=6.7917&camTZ=4.1609"
+        target="_blank"
+        rel="noopener"
+        class="viewer-preview"
+        id="viewer-preview"
+      >
+        <img
+          src="https://pub-3e7d870fab6147e5814d59675bd67072.r2.dev/Psalm_119_105_Feather_Preview_Image.png"
+          alt="Psalm 119:105 — Explore in 3D"
+          class="viewer-preview-img"
+        />
+        <div class="viewer-preview-overlay">
+          <div class="viewer-preview-btn">
+            <span class="viewer-preview-icon">✦</span>
+            <span>Explore in 3D</span>
+            <span class="viewer-preview-arrow">↗</span>
+          </div>
+          <div class="viewer-preview-hint">Opens in full screen</div>
         </div>
-        <iframe
-          id="viewer-frame"
-          data-src="https://angelacashay.github.io/AC-3D-Viewer/viewer.html?model=Psalm-119_105_04072026-NoLightmap.glb&glowOn=1&glowInt=1.2&glowBlur=64&glowCol=a259ff&emOn=0&emCol=c9a96e&emStr=1&bg=04010f&exp=0.57&contrast=0.94&sat=1.32&tone=1&keyInt=0.76&keyCol=ff66cc&keyX=0.91&keyY=-0.99&keyZ=0.55&spec=1&ambInt=0.57&ambCol=ff5cbb&groundCol=020113&fillInt=0.6&fillCol=00ffcc&fillX=2&fillY=2.2&fillZ=2&fill2On=1&fill2Int=0.2&fill2Col=ffccaa&fill2X=4.2&fill2Y=0.5&fill2Z=-0.5&bloom=1&bloomInt=1.2&bloomThresh=0.3&bloomKernel=64&dof=0&dofDist=10&dofAp=0.05&dofFocal=50&vig=0&vigInt=0.5&vigCol=000000&grain=1&grainInt=0.08&chrom=0.51&sharp=0.26&fov=0.8&rotate=0&rotSpd=0.005&rotDir=1&wire=0&shSelf=1&shGnd=1&shKey=1&shFill=1&shInt=0.5&shBlur=2&shH=0.1&ht=1&htSize=1.5&htAngle=0&htContrast=2.45&htColor=000000&htPattern=0&htColorMode=1&htGlbOnly=1&camAlpha=-4.9340&camBeta=1.6865&camRadius=13.5687&camTX=5.4306&camTY=8.7338&camTZ=3.4180"
-          src=""
-          allowfullscreen
-          title="Psalm 119:105 3D Scene"
-          onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
-        ></iframe>
-      </div>
+      </a>
     </div>
     <div class="viewer-hints">
-      <div class="viewer-hint-row">
-        <span class="viewer-hint-label">Mobile:</span>
-        <span>Tap and drag to orbit</span>
-        <span>·</span>
-        <span>Pinch to zoom</span>
-      </div>
-      <div class="viewer-hint-row">
-        <span class="viewer-hint-label">Desktop:</span>
-        <span>Drag to orbit</span>
-        <span>·</span>
-        <span>Scroll to zoom</span>
-        <span>·</span>
-        <span>Right-drag to pan</span>
-      </div>
-      <div class="viewer-creator-hint">If you get lost in the scene, tap <strong>↩ Creator View</strong> to return to the original perspective.</div>
+      <div class="viewer-creator-hint">Drag to orbit · Pinch to zoom · <strong>↩ Creator View</strong> to reset perspective.</div>
     </div>
   </div>
 </section>
