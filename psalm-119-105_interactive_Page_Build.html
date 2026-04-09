@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
   <title>Psalm 119:105 · Angela Cashay</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400&family=Noto+Sans+Hebrew:wght@400;500&display=swap');
@@ -15,12 +15,13 @@
       --surface:rgba(255,255,255,0.04);
       --surface2:rgba(255,255,255,0.07);
       --border:rgba(255,255,255,0.09);
-      --accent:#c9a96e;
-      --accent-dim:rgba(201,169,110,0.12);
-      --accent-mid:rgba(201,169,110,0.32);
+      --accent:#43B4FF;
+      --accent-dim:rgba(67,180,255,0.12);
+      --accent-mid:rgba(67,180,255,0.32);
       --purple:#a259ff;
-      --cyan:#00ffcc;
-      --pink:#ff66cc;
+      --pink:#FF9CFE;
+      --yellow:#FFF081;
+      --blue:#43B4FF;
       --text:rgba(255,255,255,0.92);
       --text-mid:rgba(255,255,255,0.65);
       --text-dim:rgba(255,255,255,0.45);
@@ -44,21 +45,9 @@
       background:rgba(0,3,51,0.94);backdrop-filter:blur(16px);
       border-bottom:1px solid var(--border);
     }
-    .nav-brand{
-      font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:400;
-      letter-spacing:0.26em;text-transform:uppercase;
-      color:var(--accent);text-decoration:none;
-    }
+    .nav-brand{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:400;letter-spacing:0.26em;text-transform:uppercase;color:var(--accent);text-decoration:none;}
     .nav-sections{display:flex;gap:4px;align-items:center}
-    .nav-item{
-      display:flex;align-items:center;gap:5px;
-      background:transparent;border:1px solid transparent;
-      color:var(--text-mid);
-      font-family:'Jost',sans-serif;font-size:9px;font-weight:300;
-      letter-spacing:0.16em;text-transform:uppercase;
-      padding:5px 11px;border-radius:2px;
-      cursor:pointer;text-decoration:none;transition:all 0.2s;white-space:nowrap;
-    }
+    .nav-item{display:flex;align-items:center;gap:5px;background:transparent;border:1px solid transparent;color:var(--text-mid);font-family:'Jost',sans-serif;font-size:9px;font-weight:300;letter-spacing:0.16em;text-transform:uppercase;padding:5px 11px;border-radius:2px;cursor:pointer;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
     .nav-item:hover,.nav-item.active{border-color:var(--accent-mid);color:var(--accent);background:var(--accent-dim)}
     .nav-num{font-size:8px;opacity:0.7;font-weight:400}
 
@@ -69,47 +58,18 @@
       text-align:center;padding-left:24px;padding-right:24px;padding-bottom:52px;
       position:relative;overflow:hidden;
     }
-    #verse-header::before{
-      content:'';position:absolute;inset:0;
-      background:radial-gradient(ellipse at center,rgba(162,89,255,0.1) 0%,transparent 68%);
-      pointer-events:none;
-    }
-    .verse-label{
-      font-size:9px;letter-spacing:0.36em;text-transform:uppercase;
-      color:var(--accent);margin-bottom:22px;
-      animation:fadeUp 0.8s ease forwards;
-    }
-    .verse-text{
-      font-family:'Cormorant Garamond',serif;
-      font-size:clamp(24px,4.5vw,54px);font-weight:300;font-style:italic;
-      line-height:1.4;letter-spacing:0.02em;
-      color:rgba(255,255,255,0.95);
-      max-width:800px;margin-bottom:20px;
-      animation:fadeUp 0.8s 0.15s ease both;
-    }
+    #verse-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(162,89,255,0.1) 0%,transparent 68%);pointer-events:none;}
+    .verse-label{font-size:9px;letter-spacing:0.36em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;animation:fadeUp 0.8s ease forwards;}
+    .verse-text{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,4.5vw,54px);font-weight:300;font-style:italic;line-height:1.4;letter-spacing:0.02em;color:rgba(255,255,255,0.95);max-width:800px;margin-bottom:20px;animation:fadeUp 0.8s 0.15s ease both;}
     .verse-text strong{color:var(--purple);font-style:normal;font-weight:500}
-    .verse-text .lamp{color:var(--cyan);font-style:normal;font-weight:500}
+    .verse-text .lamp{color:var(--yellow);font-style:normal;font-weight:500}
+    .verse-text .feet{color:var(--blue);font-style:normal;font-weight:500}
+    .verse-text .light{color:var(--yellow);font-style:normal;font-weight:500}
     .verse-text .path{color:var(--pink);font-style:normal;font-weight:500}
-    .verse-ref{
-      font-size:10px;letter-spacing:0.3em;text-transform:uppercase;
-      color:var(--accent);
-      animation:fadeUp 0.8s 0.3s ease both;
-    }
-    .verse-divider{
-      width:1px;height:44px;
-      background:linear-gradient(to bottom,var(--accent-mid),transparent);
-      margin:26px auto 0;
-      animation:fadeUp 0.8s 0.45s ease both;
-    }
-    .verse-intro{
-      max-width:660px;margin:32px auto 0;text-align:center;
-      animation:fadeUp 0.8s 0.6s ease both;
-    }
-    .verse-intro p{
-      font-family:'Cormorant Garamond',serif;
-      font-size:16px;font-style:italic;font-weight:300;
-      color:var(--text-dim);line-height:1.85;letter-spacing:0.02em;
-    }
+    .verse-ref{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--accent);animation:fadeUp 0.8s 0.3s ease both;}
+    .verse-divider{width:1px;height:44px;background:linear-gradient(to bottom,var(--accent-mid),transparent);margin:26px auto 0;animation:fadeUp 0.8s 0.45s ease both;}
+    .verse-intro{max-width:660px;margin:32px auto 0;text-align:center;animation:fadeUp 0.8s 0.6s ease both;}
+    .verse-intro p{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;font-weight:300;color:var(--text-dim);line-height:1.85;letter-spacing:0.02em;}
     .verse-intro p + p{margin-top:14px}
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -117,232 +77,109 @@
     /* Sections */
     .section{padding:84px 0;position:relative}
     .section-inner{max-width:1200px;margin:0 auto;padding:0 32px}
-
     .section-header{margin-bottom:20px}
-    .section-num{
-      font-family:'Jost',sans-serif;
-      font-size:10px;font-weight:400;
-      letter-spacing:0.32em;text-transform:uppercase;
-      color:var(--accent);margin-bottom:8px;
-    }
-    .section-title{
-      font-family:'Cormorant Garamond',serif;
-      font-size:clamp(24px,3vw,36px);font-weight:400;
-      letter-spacing:0.03em;color:var(--text);
-      margin-bottom:6px;
-    }
-    .section-subtitle{
-      font-size:10px;letter-spacing:0.24em;text-transform:uppercase;
-      color:var(--text-mid);margin-bottom:22px;
-    }
-    .section-desc{
-      font-family:'Cormorant Garamond',serif;
-      font-size:16px;font-style:italic;font-weight:300;
-      color:var(--text-dim);line-height:1.8;
-      max-width:620px;margin-bottom:36px;
-    }
-    .section-divider{
-      height:1px;
-      background:linear-gradient(to right,transparent,var(--border),transparent);
-    }
+    .section-num{font-family:'Jost',sans-serif;font-size:10px;font-weight:400;letter-spacing:0.32em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3vw,36px);font-weight:400;letter-spacing:0.03em;color:var(--text);margin-bottom:6px;}
+    .section-subtitle{font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--text-mid);margin-bottom:22px;}
+    .section-desc{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;font-weight:300;color:var(--text-dim);line-height:1.8;max-width:620px;margin-bottom:36px;}
+    .section-divider{height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);}
 
     /* Renders */
-    .renders-strip{
-      display:flex;gap:12px;
-      overflow-x:auto;padding-bottom:16px;
-      scroll-snap-type:x mandatory;
-      -webkit-overflow-scrolling:touch;cursor:grab;
-    }
+    .renders-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;cursor:grab;}
     .renders-strip:active{cursor:grabbing}
     .renders-strip::-webkit-scrollbar{height:2px}
     .renders-strip::-webkit-scrollbar-thumb{background:var(--accent-mid);border-radius:1px}
-    .render-card{
-      flex-shrink:0;width:280px;aspect-ratio:4/5;
-      border-radius:2px;overflow:hidden;
-      scroll-snap-align:start;
-      border:1px solid var(--border);
-      transition:border-color 0.3s,transform 0.3s;cursor:pointer;
-    }
+    .render-card{flex-shrink:0;width:280px;aspect-ratio:4/5;border-radius:2px;overflow:hidden;scroll-snap-align:start;border:1px solid var(--border);transition:border-color 0.3s,transform 0.3s;cursor:pointer;}
     .render-card:hover{border-color:var(--accent-mid);transform:scale(1.02)}
     .render-card img{width:100%;height:100%;object-fit:cover;display:block}
-    .renders-hint{
-      margin-top:14px;font-size:9px;letter-spacing:0.2em;
-      text-transform:uppercase;color:var(--text-muted);
-      display:flex;align-items:center;gap:8px;
-    }
+    .renders-hint{margin-top:14px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:8px;}
     .renders-hint::before{content:'←';opacity:0.5}
     .renders-hint::after{content:'→';opacity:0.5}
 
+    /* Lazy iframe wrapper */
+    .lazy-frame-wrap{position:relative;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+    .lazy-frame-wrap iframe{width:100%;height:100%;border:none;display:block;touch-action:none;}
+    .frame-loader{
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:12px;background:var(--surface);
+      transition:opacity 0.4s;pointer-events:none;
+    }
+    .frame-loader.hidden{opacity:0}
+    .loader-ring{width:28px;height:28px;border-radius:50%;border:1px solid rgba(67,180,255,0.15);border-top-color:var(--accent);animation:spin 0.9s linear infinite;}
+    .loader-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
     /* Rive */
     #rive-section{background:linear-gradient(to bottom,var(--bg),rgba(162,89,255,0.05),var(--bg))}
-    .rive-wrap{
-      width:100%;max-width:540px;margin:0 auto;
-      aspect-ratio:4/5;border-radius:4px;overflow:hidden;
-      border:1px solid var(--border);
-    }
-    .rive-wrap iframe{width:100%;height:100%;border:none;display:block}
-    .rive-note{
-      text-align:center;margin-top:16px;
-      font-size:11px;letter-spacing:0.12em;
-      color:var(--text-muted);font-style:italic;
-      font-family:'Cormorant Garamond',serif;
-    }
+    .rive-wrap{width:100%;max-width:540px;margin:0 auto;aspect-ratio:4/5;}
+    .rive-note{text-align:center;margin-top:16px;font-size:11px;letter-spacing:0.12em;color:var(--text-muted);font-style:italic;font-family:'Cormorant Garamond',serif;}
 
     /* Viewer */
-    .viewer-wrap{
-      width:100%;height:72vh;min-height:520px;
-      border-radius:2px;overflow:hidden;
-      border:1px solid var(--border);
-    }
-    .viewer-wrap iframe{width:100%;height:100%;border:none;display:block}
-    .viewer-hints{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
-    .viewer-hint-row{display:flex;align-items:center;gap:10px}
-    .viewer-hint-label{
-      font-size:9px;letter-spacing:0.22em;text-transform:uppercase;
-      color:var(--accent);opacity:0.8;font-weight:400;
-    }
-    .viewer-hint-row span{
-      font-size:9px;letter-spacing:0.16em;text-transform:uppercase;
-      color:var(--text-mid);
-    }
-    .viewer-creator-hint{
-      font-family:'Cormorant Garamond',serif;
-      font-size:14px;font-style:italic;
-      color:var(--text-dim);margin-top:4px;text-align:center;
-    }
-    .viewer-creator-hint strong{color:var(--accent);font-weight:400;font-style:normal}
+    .viewer-outer{width:100%;height:72vh;min-height:520px;}
+    .viewer-hints{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .viewer-hint-row{display:flex;align-items:center;gap:10px;}
+    .viewer-hint-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);opacity:0.9;font-weight:400;}
+    .viewer-hint-row span{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-mid);}
+    .viewer-creator-hint{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text-dim);margin-top:4px;text-align:center;}
+    .viewer-creator-hint strong{color:var(--accent);font-weight:400;font-style:normal;}
 
     /* Scripture cards */
-    #scripture-section{background:linear-gradient(to bottom,var(--bg),rgba(201,169,110,0.04),var(--bg))}
+    #scripture-section{background:linear-gradient(to bottom,var(--bg),rgba(67,180,255,0.04),var(--bg))}
     .cards-wrap{max-width:700px;margin:0 auto}
     .cards-progress{display:flex;gap:6px;margin-bottom:32px;justify-content:center}
-    .progress-dot{width:24px;height:2px;border-radius:1px;background:var(--border);transition:background 0.3s,width 0.3s;cursor:pointer}
+    .progress-dot{width:24px;height:2px;border-radius:1px;background:var(--border);transition:background 0.3s,width 0.3s;cursor:pointer;}
     .progress-dot.active{background:var(--accent);width:44px}
     .card-stage{position:relative;min-height:300px}
-    .fact-card{
-      position:absolute;inset:0;
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:3px;padding:48px 44px;
-      display:flex;flex-direction:column;justify-content:center;
-      opacity:0;pointer-events:none;
-      transform:translateX(30px);
-      transition:opacity 0.4s ease,transform 0.4s ease;
-    }
+    .fact-card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:48px 44px;display:flex;flex-direction:column;justify-content:center;opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity 0.4s ease,transform 0.4s ease;}
     .fact-card.active{opacity:1;pointer-events:all;transform:translateX(0)}
-    .card-number{
-      font-family:'Jost',sans-serif;font-size:10px;font-weight:400;
-      letter-spacing:0.3em;text-transform:uppercase;
-      color:var(--accent);margin-bottom:22px;
-    }
-    .card-text{
-      font-family:'Cormorant Garamond',serif;
-      font-size:clamp(20px,2.5vw,26px);font-weight:400;
-      line-height:1.6;color:var(--text);
-      margin-bottom:16px;
-    }
-    .card-sub{
-      font-family:'Cormorant Garamond',serif;
-      font-size:15px;font-weight:300;
-      color:var(--text-mid);line-height:1.75;font-style:italic;
-    }
-    .card-hebrew{
-      font-family:'Noto Sans Hebrew','Arial Hebrew','SBL Hebrew',serif;
-      font-size:52px;font-weight:400;
-      color:var(--accent);margin-top:20px;
-      direction:rtl;line-height:1;
-    }
+    .card-number{font-family:'Jost',sans-serif;font-size:10px;font-weight:400;letter-spacing:0.3em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;}
+    .card-text{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,2.5vw,26px);font-weight:400;line-height:1.6;color:var(--text);margin-bottom:16px;}
+    .card-sub{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;color:var(--text-mid);line-height:1.75;font-style:italic;}
+    .card-hebrew{font-family:'Noto Sans Hebrew','Arial Hebrew','SBL Hebrew',serif;font-size:52px;font-weight:400;color:var(--accent);margin-top:20px;direction:rtl;line-height:1;}
     .cards-nav{display:flex;align-items:center;justify-content:space-between;margin-top:24px}
-    .card-btn{
-      background:transparent;border:1px solid var(--border);
-      color:var(--text-mid);
-      font-family:'Jost',sans-serif;font-size:9px;font-weight:400;
-      letter-spacing:0.22em;text-transform:uppercase;
-      padding:9px 22px;border-radius:2px;cursor:pointer;transition:all 0.2s;
-    }
+    .card-btn{background:transparent;border:1px solid var(--border);color:var(--text-mid);font-family:'Jost',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;padding:9px 22px;border-radius:2px;cursor:pointer;transition:all 0.2s;}
     .card-btn:hover{border-color:var(--accent-mid);color:var(--accent);background:var(--accent-dim)}
     .card-btn:disabled{opacity:0.25;cursor:not-allowed}
-    .card-counter{font-size:10px;letter-spacing:0.2em;color:var(--text-mid)}
+    .card-counter{font-size:10px;letter-spacing:0.2em;color:var(--text-mid);}
 
     /* Video */
-    .video-wrap{
-      max-width:420px;margin:0 auto;
-      aspect-ratio:9/16;border-radius:4px;overflow:hidden;
-      border:1px solid var(--border);
-    }
-    .video-wrap iframe{width:100%;height:100%;border:none;display:block}
+    .video-outer{max-width:420px;margin:0 auto;aspect-ratio:9/16;}
 
     /* Behind the Scenes */
-    #bts-section{background:linear-gradient(to bottom,var(--bg),rgba(201,169,110,0.02),var(--bg))}
-    .collapsible-header{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:22px 28px;
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:3px;cursor:pointer;transition:all 0.2s;user-select:none;
-    }
+    #bts-section{background:linear-gradient(to bottom,var(--bg),rgba(67,180,255,0.02),var(--bg))}
+    .collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;background:var(--surface);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all 0.2s;user-select:none;}
     .collapsible-header:hover{border-color:var(--accent-mid);background:var(--surface2)}
-    .collapsible-title{
-      font-family:'Cormorant Garamond',serif;
-      font-size:19px;font-weight:400;letter-spacing:0.05em;
-      color:var(--text);
-    }
-    .collapsible-icon{font-size:16px;color:var(--accent);transition:transform 0.3s;flex-shrink:0}
+    .collapsible-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:400;letter-spacing:0.05em;color:var(--text);}
+    .collapsible-icon{font-size:16px;color:var(--accent);transition:transform 0.3s;flex-shrink:0;}
     .collapsible-header.open .collapsible-icon{transform:rotate(180deg)}
-    .collapsible-body{max-height:0;overflow:hidden;transition:max-height 0.5s ease}
+    .collapsible-body{max-height:0;overflow:hidden;transition:max-height 0.5s ease;}
     .collapsible-body.open{max-height:3000px}
-    .bts-inner{padding:32px 0 0;display:flex;flex-direction:column;gap:28px}
-    .bts-text{
-      font-family:'Cormorant Garamond',serif;
-      font-size:16px;font-style:italic;font-weight:300;
-      color:var(--text-dim);line-height:1.85;max-width:700px;
-    }
+    .bts-inner{padding:32px 0 0;display:flex;flex-direction:column;gap:28px;}
+    .bts-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;font-weight:300;color:var(--text-dim);line-height:1.85;max-width:700px;}
     .bts-text p + p{margin-top:14px}
-    .bts-wide{
-      width:100%;aspect-ratio:16/9;border-radius:2px;overflow:hidden;
-      border:1px solid var(--border);background:var(--surface);
-      display:flex;align-items:center;justify-content:center;
-    }
-    .bts-wide iframe{width:100%;height:100%;border:none;display:block}
-    .bts-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .bts-portrait{
-      aspect-ratio:3/4;border-radius:2px;overflow:hidden;
-      border:1px solid var(--border);background:var(--surface);
-      display:flex;align-items:center;justify-content:center;
-    }
-    .bts-portrait img,.bts-wide img{width:100%;height:100%;object-fit:cover;display:block}
-    .bts-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;padding:20px}
-    .bts-placeholder-icon{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px}
-    .bts-placeholder-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);text-align:center;line-height:1.7}
+    .bts-wide{width:100%;aspect-ratio:16/9;border-radius:2px;overflow:hidden;border:1px solid var(--border);}
+    .bts-wide iframe{width:100%;height:100%;border:none;display:block;}
+    .bts-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .bts-portrait{aspect-ratio:3/4;border-radius:2px;overflow:hidden;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;}
+    .bts-portrait img,.bts-wide img{width:100%;height:100%;object-fit:cover;display:block;}
+    .bts-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;padding:20px;}
+    .bts-placeholder-icon{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:14px;}
+    .bts-placeholder-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);text-align:center;line-height:1.7;}
 
     /* Closing */
-    .closing-band{
-      padding:64px 32px;text-align:center;
-      border-top:1px solid var(--border);
-      background:linear-gradient(to bottom,rgba(162,89,255,0.04),transparent);
-    }
-    .closing-text{
-      font-family:'Cormorant Garamond',serif;
-      font-size:clamp(17px,2.5vw,23px);font-weight:300;font-style:italic;
-      color:var(--text-mid);line-height:1.85;
-      max-width:660px;margin:0 auto 32px;
-    }
-    .cta-btn{
-      display:inline-flex;background:transparent;
-      border:1px solid var(--accent-mid);color:var(--accent);
-      font-family:'Jost',sans-serif;font-size:9px;font-weight:400;
-      letter-spacing:0.26em;text-transform:uppercase;
-      padding:11px 32px;border-radius:2px;text-decoration:none;
-      cursor:pointer;transition:all 0.22s;
-    }
-    .cta-btn:hover{background:rgba(201,169,110,0.15)}
+    .closing-band{padding:64px 32px;text-align:center;border-top:1px solid var(--border);background:linear-gradient(to bottom,rgba(162,89,255,0.04),transparent);}
+    .closing-text{font-family:'Cormorant Garamond',serif;font-size:clamp(17px,2.5vw,23px);font-weight:300;font-style:italic;color:var(--text-mid);line-height:1.85;max-width:660px;margin:0 auto 32px;}
+    .cta-btn{display:inline-flex;background:transparent;border:1px solid var(--accent-mid);color:var(--accent);font-family:'Jost',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.26em;text-transform:uppercase;padding:11px 32px;border-radius:2px;text-decoration:none;cursor:pointer;transition:all 0.22s;}
+    .cta-btn:hover{background:rgba(67,180,255,0.15)}
 
     /* Footer */
-    footer{border-top:1px solid var(--border);padding:40px 28px;text-align:center;background:var(--bg-deep)}
-    .footer-verse{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;font-weight:300;color:var(--text-dim);letter-spacing:0.04em;margin-bottom:18px}
-    .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
-    .footer-link{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color 0.2s}
+    footer{border-top:1px solid var(--border);padding:40px 28px;text-align:center;background:var(--bg-deep);}
+    .footer-verse{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;font-weight:300;color:var(--text-dim);letter-spacing:0.04em;margin-bottom:18px;}
+    .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;}
+    .footer-link{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color 0.2s;}
     .footer-link:hover{color:var(--accent)}
-    .footer-copy{font-size:9px;letter-spacing:0.14em;color:var(--text-muted)}
+    .footer-copy{font-size:9px;letter-spacing:0.14em;color:var(--text-muted);}
 
     /* Responsive */
     @media(max-width:768px){
@@ -381,8 +218,8 @@
 <div id="verse-header">
   <div class="verse-label">Psalm 119:105 · NIV</div>
   <div class="verse-text">
-    "Your <strong>word</strong> is a <span class="lamp">lamp</span> to my feet,<br>
-    a <span class="lamp">light</span> on my <span class="path">path</span>."
+    "Your <strong>word</strong> is a <span class="lamp">lamp</span> to my <span class="feet">feet</span>,<br>
+    a <span class="light">light</span> on my <span class="path">path</span>."
   </div>
   <div class="verse-ref">Psalm 119:105 (NIV)</div>
   <div class="verse-divider"></div>
@@ -434,7 +271,21 @@
       <p class="section-desc">I wanted to bring the animated version I originally created in After Effects to life so people could interact with the scripture. I used Rive to create this interactive text.</p>
     </div>
     <div class="rive-wrap">
-      <iframe src="https://rive.app/s/qOBwIARQOkmaJxQ12wrbJg/embed?runtime=rive-renderer" allowfullscreen allow="autoplay" title="Psalm 119:105 Interactive Hebrew Word Animation"></iframe>
+      <div class="lazy-frame-wrap" id="rive-wrap-inner" style="aspect-ratio:4/5;">
+        <div class="frame-loader" id="rive-loader">
+          <div class="loader-ring"></div>
+          <div class="loader-label">Loading Animation</div>
+        </div>
+        <iframe
+          id="rive-frame"
+          data-src="https://rive.app/s/qOBwIARQOkmaJxQ12wrbJg/embed?runtime=rive-renderer"
+          src=""
+          allowfullscreen allow="autoplay"
+          title="Psalm 119:105 Interactive Hebrew Word Animation"
+          style="height:100%;"
+          onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
+        ></iframe>
+      </div>
     </div>
     <div class="rive-note">* Hebrew word meanings were referenced using Strong's Expanded Exhaustive Concordance.</div>
   </div>
@@ -451,11 +302,21 @@
       <div class="section-subtitle">Interactive 3D Drawing</div>
       <p class="section-desc">This scene was drawn using Feather 3D. I invite you to explore the full 3D drawing.</p>
     </div>
-    <div class="viewer-wrap">
-      <iframe
-        src="https://angelacashay.github.io/AC-3D-Viewer/viewer.html?model=Psalm-119_105_04072026-NoLightmap.glb&glowOn=1&glowInt=1.2&glowBlur=64&glowCol=a259ff&emOn=0&emCol=c9a96e&emStr=1&bg=04010f&exp=0.57&contrast=0.94&sat=1.32&tone=1&keyInt=0.76&keyCol=ff66cc&keyX=0.91&keyY=-0.99&keyZ=0.55&spec=1&ambInt=0.57&ambCol=ff5cbb&groundCol=020113&fillInt=0.6&fillCol=00ffcc&fillX=2&fillY=2.2&fillZ=2&fill2On=1&fill2Int=0.2&fill2Col=ffccaa&fill2X=4.2&fill2Y=0.5&fill2Z=-0.5&bloom=1&bloomInt=1.2&bloomThresh=0.3&bloomKernel=64&dof=0&dofDist=10&dofAp=0.05&dofFocal=50&vig=0&vigInt=0.5&vigCol=000000&grain=1&grainInt=0.08&chrom=0.51&sharp=0.26&fov=0.8&rotate=0&rotSpd=0.005&rotDir=1&wire=0&shSelf=1&shGnd=1&shKey=1&shFill=1&shInt=0.5&shBlur=2&shH=0.1&ht=1&htSize=1.5&htAngle=0&htContrast=2.45&htColor=000000&htPattern=0&htColorMode=1&htGlbOnly=1&camAlpha=-4.9340&camBeta=1.6865&camRadius=13.5687&camTX=5.4306&camTY=8.7338&camTZ=3.4180"
-        allowfullscreen title="Psalm 119:105 3D Scene"
-      ></iframe>
+    <div class="viewer-outer">
+      <div class="lazy-frame-wrap" id="viewer-wrap-inner" style="height:100%;">
+        <div class="frame-loader" id="viewer-loader">
+          <div class="loader-ring"></div>
+          <div class="loader-label">Loading 3D Scene</div>
+        </div>
+        <iframe
+          id="viewer-frame"
+          data-src="https://angelacashay.github.io/AC-3D-Viewer/viewer.html?model=Psalm-119_105_04072026-NoLightmap.glb&glowOn=1&glowInt=1.2&glowBlur=64&glowCol=a259ff&emOn=0&emCol=c9a96e&emStr=1&bg=04010f&exp=0.57&contrast=0.94&sat=1.32&tone=1&keyInt=0.76&keyCol=ff66cc&keyX=0.91&keyY=-0.99&keyZ=0.55&spec=1&ambInt=0.57&ambCol=ff5cbb&groundCol=020113&fillInt=0.6&fillCol=00ffcc&fillX=2&fillY=2.2&fillZ=2&fill2On=1&fill2Int=0.2&fill2Col=ffccaa&fill2X=4.2&fill2Y=0.5&fill2Z=-0.5&bloom=1&bloomInt=1.2&bloomThresh=0.3&bloomKernel=64&dof=0&dofDist=10&dofAp=0.05&dofFocal=50&vig=0&vigInt=0.5&vigCol=000000&grain=1&grainInt=0.08&chrom=0.51&sharp=0.26&fov=0.8&rotate=0&rotSpd=0.005&rotDir=1&wire=0&shSelf=1&shGnd=1&shKey=1&shFill=1&shInt=0.5&shBlur=2&shH=0.1&ht=1&htSize=1.5&htAngle=0&htContrast=2.45&htColor=000000&htPattern=0&htColorMode=1&htGlbOnly=1&camAlpha=-4.9340&camBeta=1.6865&camRadius=13.5687&camTX=5.4306&camTY=8.7338&camTZ=3.4180"
+          src=""
+          allowfullscreen
+          title="Psalm 119:105 3D Scene"
+          onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
+        ></iframe>
+      </div>
     </div>
     <div class="viewer-hints">
       <div class="viewer-hint-row">
@@ -503,7 +364,7 @@
         <div class="fact-card" data-index="1">
           <div class="card-number">Fact 02 of 04</div>
           <div class="card-text">It is written as an acrostic poem in Hebrew.</div>
-          <div class="card-sub">An acrostic poem is a poem where the first letter of each line or section spells out a word, phrase, or follows a sequence — in this case, the Hebrew alphabet.</div>
+          <div class="card-sub">An acrostic poem is a poem where the first letter of each line or section spells out a word, phrase, or follows a sequence, in this case the Hebrew alphabet.</div>
         </div>
         <div class="fact-card" data-index="2">
           <div class="card-number">Fact 03 of 04</div>
@@ -535,13 +396,22 @@
       <div class="section-title">Animated Scripture Video</div>
       <div class="section-subtitle">Psalm 119:105 · 3D Illustration + Annotated Verse Map</div>
     </div>
-    <div class="video-wrap">
-      <iframe
-        src="https://www.youtube.com/embed/1s4zmiayx6w"
-        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-        title="Psalm 119:105 Animated Video"
-      ></iframe>
+    <div class="video-outer">
+      <div class="lazy-frame-wrap" id="video-wrap-inner" style="aspect-ratio:9/16;">
+        <div class="frame-loader" id="video-loader">
+          <div class="loader-ring"></div>
+          <div class="loader-label">Loading Video</div>
+        </div>
+        <iframe
+          id="video-frame"
+          data-src="https://www.youtube.com/embed/zGwIcTUxLiw"
+          src=""
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          title="Psalm 119:105 Animated Video"
+          onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
+        ></iframe>
+      </div>
     </div>
   </div>
 </section>
@@ -566,14 +436,16 @@
           <p>The challenge was finding a way to present my GLB files in real time while staying true to my creative vision. Standard real-time viewers didn't give me the control I needed over lighting, atmosphere, and post-processing. So I built a custom viewer and editor using Babylon.js, a WebGL rendering engine, that allowed me to fine-tune every aspect of the illustration: lighting, glow, bloom, depth of field, chromatic aberration, halftone effects, and more. Once I had the look I wanted, I could share it as a single link that opens with all of those settings already applied.</p>
           <p>This is a growing work in progress, but I am encouraged by what is possible at this early stage.</p>
         </div>
-        <!-- Screen Recording -->
+        <!-- BTS Video placeholder -->
         <div class="bts-wide">
-          <div class="bts-placeholder">
-            <div class="bts-placeholder-icon">▶</div>
-            <div class="bts-placeholder-label">Screen Recording · Editor in Action<br>Upload to YouTube Unlisted · Replace with embed</div>
-          </div>
+          <iframe
+            src="https://www.youtube.com/embed/mw89vnaMajU"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            title="Behind the Scenes — Editor in Action"
+          ></iframe>
         </div>
-        <!-- Two column -->
+        <!-- Two column screenshots -->
         <div class="bts-two-col">
           <div class="bts-portrait">
             <div class="bts-placeholder">
@@ -589,14 +461,14 @@
           </div>
         </div>
         <!-- Inspector -->
-        <div class="bts-wide">
+        <div class="bts-wide" style="background:var(--surface);display:flex;align-items:center;justify-content:center;">
           <div class="bts-placeholder">
             <div class="bts-placeholder-icon">✦</div>
             <div class="bts-placeholder-label">Inspector View · Scene Graph<br>2560 × 1440px</div>
           </div>
         </div>
         <!-- Final result -->
-        <div class="bts-wide">
+        <div class="bts-wide" style="background:var(--surface);display:flex;align-items:center;justify-content:center;">
           <div class="bts-placeholder">
             <div class="bts-placeholder-icon">✦</div>
             <div class="bts-placeholder-label">Final Viewer Result<br>2560 × 1440px</div>
@@ -628,10 +500,26 @@
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-// Active nav on scroll
+// ── Lazy load iframes via IntersectionObserver ──
+const lazyFrames = document.querySelectorAll('iframe[data-src]');
+const frameObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      const iframe = entry.target;
+      if(!iframe.src || iframe.src === window.location.href) {
+        iframe.src = iframe.dataset.src;
+      }
+      frameObserver.unobserve(iframe);
+    }
+  });
+}, { rootMargin: '200px 0px', threshold: 0.01 });
+
+lazyFrames.forEach(frame => frameObserver.observe(frame));
+
+// ── Active nav on scroll ──
 const sections = ['renders','rive-section','viewer-section','scripture-section','video-section'];
 const navItems = document.querySelectorAll('.nav-item');
-const observer = new IntersectionObserver(entries => {
+const sectionObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if(entry.isIntersecting){
       navItems.forEach(i => i.classList.remove('active'));
@@ -640,9 +528,9 @@ const observer = new IntersectionObserver(entries => {
     }
   });
 }, {threshold:0.3, rootMargin:'-52px 0px 0px 0px'});
-sections.forEach(id => { const el=document.getElementById(id); if(el) observer.observe(el); });
+sections.forEach(id => { const el=document.getElementById(id); if(el) sectionObserver.observe(el); });
 
-// Drag scroll renders
+// ── Drag scroll renders ──
 const strip = document.getElementById('renders-strip');
 let isDown=false, startX, scrollLeft;
 strip.addEventListener('mousedown', e=>{isDown=true;strip.style.cursor='grabbing';startX=e.pageX-strip.offsetLeft;scrollLeft=strip.scrollLeft});
@@ -650,7 +538,7 @@ strip.addEventListener('mouseleave', ()=>{isDown=false;strip.style.cursor='grab'
 strip.addEventListener('mouseup', ()=>{isDown=false;strip.style.cursor='grab'});
 strip.addEventListener('mousemove', e=>{if(!isDown)return;e.preventDefault();const x=e.pageX-strip.offsetLeft;strip.scrollLeft=scrollLeft-(x-startX)*1.5});
 
-// Scripture cards
+// ── Scripture cards ──
 let cur=0;
 const cards=document.querySelectorAll('.fact-card');
 const dots=document.querySelectorAll('.progress-dot');
@@ -673,12 +561,12 @@ document.querySelector('.card-stage').addEventListener('touchend',e=>{
   if(Math.abs(diff)>50){if(diff>0&&cur<cards.length-1)showCard(cur+1);else if(diff<0&&cur>0)showCard(cur-1);}
 });
 
-// Collapsible
+// ── Collapsible BTS ──
 const btsToggle=document.getElementById('bts-toggle');
 const btsBody=document.getElementById('bts-body');
 btsToggle.addEventListener('click',()=>{btsToggle.classList.toggle('open');btsBody.classList.toggle('open')});
 
-// Lightbox
+// ── Lightbox ──
 const lb=document.createElement('div');
 lb.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,3,51,0.97);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;cursor:zoom-out;';
 lb.innerHTML='<img id="lb-img" style="max-height:92vh;max-width:92vw;object-fit:contain;border-radius:2px;transform:scale(0.95);transition:transform 0.3s;" src="" alt=""><button id="lb-close" style="position:absolute;top:20px;right:24px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-family:Jost,sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;padding:7px 16px;border-radius:2px;cursor:pointer;">✕ Close</button>';
