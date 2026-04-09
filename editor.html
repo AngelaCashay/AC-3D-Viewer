@@ -235,6 +235,7 @@
       <div class="sl">Display</div>
       <div class="tr"><span class="tn">Wireframe</span><div class="tg" id="tWf"></div></div>
       <div class="tr"><span class="tn">Bounding Box</span><div class="tg" id="tBb"></div></div>
+      <div class="tr"><span class="tn">Shadeless</span><div class="tg" id="tSl"></div></div>
     </div>
 
     <div class="ps">
@@ -477,6 +478,8 @@ function loadGLB(file) {
     meshes=ms;
     frameCamera();
     applyWire();
+    origMaterials.clear();
+    if(shadeless) applyShadeless();
     if(shadowGenKey||shadowGenFill||shadowGenFill2) addMeshesToShadow();
     G('ld').classList.remove('v');
     G('dz').classList.add('h');
@@ -498,6 +501,40 @@ function frameCamera() {
 }
 
 function applyWire() { meshes.forEach(m=>{if(m.material) m.material.wireframe=wire}); }
+
+let shadeless = false;
+let origMaterials = new Map();
+
+function applyShadeless() {
+  shadeless = tog('tSl');
+  meshes.forEach(m => {
+    try {
+      if(!m.material || m.isDisposed()) return;
+      if(shadeless) {
+        // Store original material
+        if(!origMaterials.has(m.uniqueId)) {
+          origMaterials.set(m.uniqueId, m.material);
+        }
+        // Create shadeless material using unlit approach
+        const mat = new BABYLON.StandardMaterial('shadeless_' + m.uniqueId, scene);
+        mat.disableLighting = true;
+        // Copy diffuse/vertex color from original
+        const orig = origMaterials.get(m.uniqueId);
+        if(orig.albedoColor) mat.diffuseColor = orig.albedoColor.clone();
+        if(orig.albedoTexture) mat.diffuseTexture = orig.albedoTexture;
+        mat.useVertexColors = true;
+        mat.wireframe = wire;
+        m.material = mat;
+      } else {
+        // Restore original material
+        if(origMaterials.has(m.uniqueId)) {
+          m.material = origMaterials.get(m.uniqueId);
+          m.material.wireframe = wire;
+        }
+      }
+    } catch(e) {}
+  });
+}
 
 function getShadowBlur() { return parseFloat(G('sShBlur').value); }
 function getShadowInt() { return parseFloat(G('sShInt').value); }
@@ -712,6 +749,9 @@ function resetAllControls() {
 
   // Wireframe
   wire=false; G('tWf').classList.remove('on'); applyWire();
+  // Shadeless
+  if(shadeless){ shadeless=false; G('tSl').classList.remove('on'); applyShadeless(); }
+  origMaterials.clear();
 
   // Halftone
   if(htOn){ destroyHalftone(); htOn=false; }
@@ -846,6 +886,7 @@ function gather() {
     fov: G('sFv').value,
     rotate: tog('tRt')?1:0, rotSpd: G('sRS').value, rotDir: G('sRD').value,
     wire: tog('tWf')?1:0,
+    shadeless: tog('tSl')?1:0,
     shSelf: tog('tShSelf')?1:0, shGnd: tog('tShGnd')?1:0,
     shKey: tog('tShKey')?1:0, shFill: tog('tShFill')?1:0,
     shInt: G('sShInt').value, shBlur: G('sShBlur').value, shH: G('sShH').value,
@@ -998,6 +1039,9 @@ function bind() {
 
   // Bounding box
   G('tBb').addEventListener('click',()=>{G('tBb').classList.toggle('on');const on=tog('tBb');meshes.forEach(m=>{try{m.showBoundingBox=on}catch(e){}})});
+
+  // Shadeless
+  G('tSl').addEventListener('click',()=>{ G('tSl').classList.toggle('on'); applyShadeless(); });
 
   // Shadows
   ['tShSelf','tShGnd','tShKey','tShFill'].forEach(id=>{

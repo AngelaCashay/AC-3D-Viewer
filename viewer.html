@@ -191,6 +191,20 @@ function init(){
   BABYLON.SceneLoader.ImportMesh('','',url,scene,ms=>{
     // Apply wireframe if set
     if(p.get('wf')==='1'||p.get('wire')==='1') ms.forEach(m=>{if(m.material)m.material.wireframe=true});
+    // Apply shadeless if set
+    if(p.get('shadeless')==='1'){
+      ms.forEach(m=>{
+        try{
+          if(!m.material||m.isDisposed()) return;
+          const mat=new BABYLON.StandardMaterial('sl_'+m.uniqueId,scene);
+          mat.disableLighting=true;
+          if(m.material.albedoColor) mat.diffuseColor=m.material.albedoColor.clone();
+          if(m.material.albedoTexture) mat.diffuseTexture=m.material.albedoTexture;
+          mat.useVertexColors=true;
+          m.material=mat;
+        }catch(e){}
+      });
+    }
     // Apply emissive override if set
     const emOn=p.get('emOn')==='1';
     if(emOn){
