@@ -511,25 +511,22 @@ function applyShadeless() {
     try {
       if(!m.material || m.isDisposed()) return;
       if(shadeless) {
-        // Store original material
+        // Store original lighting state
         if(!origMaterials.has(m.uniqueId)) {
-          origMaterials.set(m.uniqueId, m.material);
+          origMaterials.set(m.uniqueId, {
+            disableLighting: m.material.disableLighting || false,
+            unlit: m.material.unlit || false
+          });
         }
-        // Create shadeless material using unlit approach
-        const mat = new BABYLON.StandardMaterial('shadeless_' + m.uniqueId, scene);
-        mat.disableLighting = true;
-        // Copy diffuse/vertex color from original
-        const orig = origMaterials.get(m.uniqueId);
-        if(orig.albedoColor) mat.diffuseColor = orig.albedoColor.clone();
-        if(orig.albedoTexture) mat.diffuseTexture = orig.albedoTexture;
-        mat.useVertexColors = true;
-        mat.wireframe = wire;
-        m.material = mat;
+        // Feather uses PBR materials — set unlit mode directly
+        if(m.material.disableLighting !== undefined) m.material.disableLighting = true;
+        if(m.material.unlit !== undefined) m.material.unlit = true;
       } else {
-        // Restore original material
+        // Restore original lighting state
         if(origMaterials.has(m.uniqueId)) {
-          m.material = origMaterials.get(m.uniqueId);
-          m.material.wireframe = wire;
+          const orig = origMaterials.get(m.uniqueId);
+          if(m.material.disableLighting !== undefined) m.material.disableLighting = orig.disableLighting;
+          if(m.material.unlit !== undefined) m.material.unlit = orig.unlit;
         }
       }
     } catch(e) {}
