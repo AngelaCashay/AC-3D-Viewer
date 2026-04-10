@@ -115,45 +115,10 @@
     .rive-wrap{width:100%;max-width:540px;margin:0 auto;aspect-ratio:4/5;}
     .rive-note{text-align:center;margin-top:16px;font-size:11px;letter-spacing:0.12em;color:var(--text-muted);font-style:italic;font-family:'Cormorant Garamond',serif;}
 
-    /* Viewer preview card */
-    /* Viewer */
-    .viewer-outer{width:100%;}
-    .viewer-container{position:relative;width:100%;height:72vh;min-height:480px;}
-    .viewer-container .lazy-frame-wrap{height:100%;border-radius:3px;border:2px solid var(--accent-mid);}
-    .viewer-container iframe{width:100%;height:100%;border:none;display:block;touch-action:none;}
-    .viewer-expand-btn{
-      position:absolute;bottom:12px;right:12px;
-      width:36px;height:36px;
-      background:rgba(0,3,51,0.8);
-      border:1px solid rgba(67,180,255,0.5);
-      border-radius:3px;color:var(--accent);font-size:16px;
-      cursor:pointer;display:flex;align-items:center;justify-content:center;
-      transition:all 0.2s;backdrop-filter:blur(8px);z-index:10;
-    }
-    .viewer-expand-btn:hover{background:rgba(67,180,255,0.2);border-color:var(--accent);}
-    .viewer-fullscreen{
-      position:fixed;inset:0;z-index:9990;
-      background:var(--bg-deep);
-      opacity:0;pointer-events:none;
-      transition:opacity 0.3s;
-      display:flex;flex-direction:column;
-    }
-    .viewer-fullscreen.open{opacity:1;pointer-events:all;}
-    .viewer-fullscreen iframe{flex:1;width:100%;border:none;display:block;touch-action:none;}
-    .viewer-fullscreen-close{
-      position:absolute;top:16px;right:16px;
-      background:rgba(0,3,51,0.85);border:1px solid rgba(67,180,255,0.4);
-      color:var(--accent);font-family:'Jost',sans-serif;font-size:9px;font-weight:400;
-      letter-spacing:0.22em;text-transform:uppercase;
-      padding:8px 18px;border-radius:2px;cursor:pointer;
-      transition:all 0.2s;backdrop-filter:blur(8px);z-index:2;
-    }
-    .viewer-fullscreen-close:hover{background:rgba(67,180,255,0.2);border-color:var(--accent);}
-    .viewer-fullscreen-hint{
-      position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
-      font-size:9px;letter-spacing:0.16em;text-transform:uppercase;
-      color:rgba(255,255,255,0.25);white-space:nowrap;pointer-events:none;
-    }
+    /* Viewer — Sketchfab */
+    .sketchfab-wrap{width:100%;height:70vh;min-height:480px;}
+    .sketchfab-wrap .lazy-frame-wrap{height:100%;border-radius:3px;border:2px solid var(--accent-mid);}
+    .sketchfab-wrap iframe{width:100%;height:100%;border:none;display:block;}
     .viewer-hints{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px;}
     .viewer-hint-row{display:flex;align-items:center;gap:10px;}
     .viewer-hint-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);opacity:0.9;font-weight:400;}
@@ -332,51 +297,31 @@
       <div class="section-subtitle">Interactive 3D Drawing</div>
       <p class="section-desc">This scene was drawn using Feather 3D. I invite you to explore the full 3D drawing.</p>
     </div>
-    <div class="viewer-outer">
-      <div class="viewer-container" id="viewer-container">
-        <div class="lazy-frame-wrap" id="viewer-wrap-inner" style="height:100%;">
-          <div class="frame-loader" id="viewer-loader">
-            <div class="loader-ring"></div>
-            <div class="loader-label">Loading 3D Scene</div>
-          </div>
-          <iframe
-            id="viewer-frame"
-            data-src=""
-            src=""
-            allowfullscreen
-            title="Psalm 119:105 3D Scene"
-            onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
-          ></iframe>
+    <div class="sketchfab-wrap">
+      <div class="lazy-frame-wrap" id="viewer-wrap-inner" style="height:100%;">
+        <div class="frame-loader" id="viewer-loader">
+          <div class="loader-ring"></div>
+          <div class="loader-label">Loading 3D Scene</div>
         </div>
-        <button class="viewer-expand-btn" id="viewer-expand" title="Expand to fullscreen">⛶</button>
+        <iframe
+          id="viewer-frame"
+          data-src="https://sketchfab.com/models/dd0cad9bb3ed4a28ae856f33ed89dd9e/embed?ui_theme=dark&preload=1&ui_infos=0&ui_watermark=0"
+          src=""
+          allowfullscreen
+          allow="autoplay; fullscreen; xr-spatial-tracking"
+          title="Psalm 119:105 3D Scene"
+          onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
+        ></iframe>
       </div>
     </div>
-
-    <!-- Fullscreen overlay -->
-    <div class="viewer-fullscreen" id="viewer-fullscreen">
-      <iframe
-        id="viewer-fullscreen-frame"
-        src=""
-        allowfullscreen
-        title="Psalm 119:105 3D Scene Fullscreen"
-      ></iframe>
-      <button class="viewer-fullscreen-close" id="viewer-fullscreen-close">✕ Close</button>
-      <div class="viewer-fullscreen-hint">Drag to orbit · Pinch to zoom · ↩ Creator View to reset</div>
-    </div>
-
     <div class="viewer-hints">
       <div class="viewer-hint-row">
-        <span class="viewer-hint-label">Mobile:</span>
-        <span>Tap ⛶ to expand · Pinch to zoom · Drag to orbit</span>
+        <span class="viewer-hint-label">Tip:</span>
+        <span>Tap the fullscreen icon in the viewer for the best experience</span>
       </div>
-      <div class="viewer-hint-row">
-        <span class="viewer-hint-label">Desktop:</span>
-        <span>Drag to orbit · Scroll to zoom · Right-drag to pan</span>
-      </div>
-      <div class="viewer-creator-hint">If you get lost in the scene, tap <strong>↩ Creator View</strong> to return to the original perspective.</div>
+      <div class="viewer-creator-hint">Drag to orbit · Scroll to zoom · Pinch to zoom on mobile</div>
       <div class="viewer-disclaimer">
-        My personalized 3D viewer with full lighting, shadows, glow, and visual effects is only available on desktop. Mobile visitors will experience a shadeless version of the illustration optimized for mobile viewing.<br><br>
-        <strong>Having trouble viewing the 3D model? <a href="https://sketchfab.com/3d-models/psalm-119105-inspired-3d-illustration-dd0cad9bb3ed4a28ae856f33ed89dd9e" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">View the shadeless version on Sketchfab ↗</a></strong>
+        <strong>Having trouble? <a href="https://sketchfab.com/3d-models/psalm-119105-inspired-3d-illustration-dd0cad9bb3ed4a28ae856f33ed89dd9e" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">Open directly on Sketchfab ↗</a></strong>
       </div>
     </div>
   </div>
@@ -481,38 +426,7 @@
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-// ── Viewer URLs — desktop full quality / mobile shadeless ──
-const desktopViewerURL = 'https://angelacashay.github.io/AC-3D-Viewer/viewer.html?model=Psalm-119_105_04072026-NoLightmap.glb&glowOn=1&glowInt=0.16&glowBlur=64&glowCol=a259ff&emOn=0&emCol=c9a96e&emStr=0.96&bg=01020a&exp=0.71&contrast=1.53&sat=1.52&tone=0&keyInt=0.5&keyCol=ff66cc&keyX=-0.72&keyY=-2.41&keyZ=-0.64&spec=1&ambInt=0.4&ambCol=be38f3&groundCol=9929bd&fillInt=0.85&fillCol=d357fe&fillX=8&fillY=0.6&fillZ=-0.2&fill2On=1&fill2Int=0.2&fill2Col=ffccaa&fill2X=-0.2&fill2Y=-0.8&fill2Z=0.3&bloom=1&bloomInt=1.2&bloomThresh=0.3&bloomKernel=64&dof=0&dofDist=10&dofAp=0.05&dofFocal=50&vig=0&vigInt=0.5&vigCol=000000&grain=0&grainInt=0&chrom=1&sharp=0&fov=0.8&rotate=0&rotSpd=0.005&rotDir=1&wire=0&shSelf=1&shGnd=1&shKey=1&shFill=1&shInt=0.67&shBlur=2&shH=0.2&ht=0&htSize=4&htAngle=0&htContrast=1&htColor=000000&htPattern=0&htColorMode=0&htGlbOnly=0&camAlpha=0.7555&camBeta=1.7583&camRadius=20.2189&camTX=6.3806&camTY=6.7917&camTZ=4.1609';
-const mobileViewerURL = 'https://sketchfab.com/models/dd0cad9bb3ed4a28ae856f33ed89dd9e/embed?ui_theme=dark&preload=1&ui_infos=0&ui_watermark=0';
-
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-const viewerURL = isMobile ? mobileViewerURL : desktopViewerURL;
-
-// Set viewer iframe data-src based on device
-const viewerFrame = document.getElementById('viewer-frame');
-const viewerFSFrame = document.getElementById('viewer-fullscreen-frame');
-if(viewerFrame) viewerFrame.dataset.src = viewerURL;
-
-// ── Fullscreen expand ──
-const expandBtn = document.getElementById('viewer-expand');
-const fsOverlay = document.getElementById('viewer-fullscreen');
-const fsClose = document.getElementById('viewer-fullscreen-close');
-
-if(expandBtn) {
-  expandBtn.addEventListener('click', () => {
-    if(viewerFSFrame && (!viewerFSFrame.src || viewerFSFrame.src === window.location.href)) {
-      viewerFSFrame.src = viewerURL;
-    }
-    fsOverlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  });
-}
-function closeFullscreen() {
-  fsOverlay.classList.remove('open');
-  document.body.style.overflow = '';
-}
-if(fsClose) fsClose.addEventListener('click', closeFullscreen);
-document.addEventListener('keydown', e => { if(e.key==='Escape' && fsOverlay && fsOverlay.classList.contains('open')) closeFullscreen(); });
+// ── Lazy load iframes ──
 const lazyFrames = document.querySelectorAll('iframe[data-src]');
 const frameObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
