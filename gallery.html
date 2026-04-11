@@ -48,6 +48,8 @@
       background:rgba(6,6,8,0.92);
       backdrop-filter:blur(12px);
     }
+    body.embed-mode nav{display:none;}
+    body.embed-mode #hero{padding-top:0;}
 
     .nav-brand{
       font-family:'Cormorant Garamond',serif;
@@ -441,6 +443,11 @@ const GALLERY_JSON = 'https://raw.githubusercontent.com/AngelaCashay/AC-3D-Viewe
 const MODEL_BASE = 'https://pub-3e7d870fab6147e5814d59675bd67072.r2.dev/';
 
 document.getElementById('yr').textContent = new Date().getFullYear();
+
+// Embed mode — hide nav when ?embed=1
+if(new URLSearchParams(window.location.search).get('embed')==='1'){
+  document.body.classList.add('embed-mode');
+}
 
 let works = [];
 let featuredWork = null;
