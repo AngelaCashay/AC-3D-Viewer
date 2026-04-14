@@ -41,15 +41,16 @@
     #nav{
       position:fixed;top:0;left:0;right:0;z-index:100;
       height:52px;display:flex;align-items:center;justify-content:space-between;
-      padding:0 28px;
+      padding:0 20px;
       background:rgba(0,3,51,0.94);backdrop-filter:blur(16px);
       border-bottom:1px solid var(--border);
+      overflow:hidden;
     }
-    .nav-brand{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:400;letter-spacing:0.26em;text-transform:uppercase;color:var(--accent);text-decoration:none;}
-    .nav-sections{display:flex;gap:4px;align-items:center}
-    .nav-item{display:flex;align-items:center;gap:5px;background:transparent;border:1px solid transparent;color:var(--text-mid);font-family:'Jost',sans-serif;font-size:9px;font-weight:300;letter-spacing:0.16em;text-transform:uppercase;padding:5px 11px;border-radius:2px;cursor:pointer;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+    .nav-brand{font-family:'Cormorant Garamond',serif;font-size:12px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);text-decoration:none;white-space:nowrap;flex-shrink:0;}
+    .nav-sections{display:flex;gap:2px;align-items:center;overflow:hidden;}
+    .nav-item{display:flex;align-items:center;gap:4px;background:transparent;border:1px solid transparent;color:var(--text-mid);font-family:'Jost',sans-serif;font-size:8px;font-weight:300;letter-spacing:0.12em;text-transform:uppercase;padding:4px 8px;border-radius:2px;cursor:pointer;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
     .nav-item:hover,.nav-item.active{border-color:var(--accent-mid);color:var(--accent);background:var(--accent-dim)}
-    .nav-num{font-size:8px;opacity:0.7;font-weight:400}
+    .nav-num{font-size:7px;opacity:0.7;font-weight:400}
 
     /* Verse Header */
     #verse-header{
@@ -112,7 +113,24 @@
 
     /* Rive */
     #rive-section{background:linear-gradient(to bottom,var(--bg),rgba(162,89,255,0.05),var(--bg))}
-    .rive-wrap{width:100%;max-width:540px;margin:0 auto;aspect-ratio:4/5;}
+    .rive-wrap{width:100%;max-width:540px;margin:0 auto;}
+    #rive-preview{
+      aspect-ratio:4/5;border-radius:4px;overflow:hidden;
+      border:2px solid var(--accent-mid);
+      background:linear-gradient(135deg,rgba(162,89,255,0.15),rgba(67,180,255,0.1));
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;transition:border-color 0.3s,box-shadow 0.3s;
+    }
+    #rive-preview:hover{border-color:var(--accent);box-shadow:0 0 24px rgba(67,180,255,0.2);}
+    .rive-preview-inner{display:flex;flex-direction:column;align-items:center;gap:12px;}
+    .rive-preview-btn{
+      display:flex;align-items:center;gap:10px;
+      background:rgba(0,3,51,0.7);border:1px solid rgba(67,180,255,0.6);
+      color:var(--accent);font-family:'Jost',sans-serif;font-size:11px;font-weight:400;
+      letter-spacing:0.26em;text-transform:uppercase;
+      padding:13px 28px;border-radius:2px;backdrop-filter:blur(8px);
+    }
+    .rive-preview-hint{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);}
     .rive-note{text-align:center;margin-top:16px;font-size:11px;letter-spacing:0.12em;color:var(--text-muted);font-style:italic;font-family:'Cormorant Garamond',serif;}
 
     /* Viewer — Sketchfab */
@@ -173,6 +191,11 @@
     .footer-copy{font-size:9px;letter-spacing:0.14em;color:var(--text-muted);}
 
     /* Responsive */
+    @media(max-width:900px){
+      .nav-item span:not(.nav-num){display:none;}
+      .nav-num{display:inline;opacity:1;font-size:11px;}
+      .nav-item{padding:5px 10px;}
+    }
     @media(max-width:768px){
       #nav{padding:0 16px}
       .nav-item{padding:5px 8px;font-size:8px;letter-spacing:0.1em}
@@ -266,20 +289,33 @@
       <p class="section-desc">I wanted to bring the animated version I originally created in After Effects to life so people could interact with the scripture. I used Rive to create this interactive text.</p>
     </div>
     <div class="rive-wrap">
-      <div class="lazy-frame-wrap" id="rive-wrap-inner" style="aspect-ratio:4/5;">
-        <div class="frame-loader" id="rive-loader">
-          <div class="loader-ring"></div>
-          <div class="loader-label">Loading Animation</div>
+      <div id="rive-container">
+        <!-- Preview shown on mobile until tapped -->
+        <div id="rive-preview" onclick="loadRive()">
+          <div class="rive-preview-inner">
+            <div class="rive-preview-btn">
+              <span>✦</span>
+              <span>Tap to Load Animation</span>
+            </div>
+            <div class="rive-preview-hint">Interactive Hebrew word animation</div>
+          </div>
         </div>
-        <iframe
-          id="rive-frame"
-          data-src="https://rive.app/s/qOBwIARQOkmaJxQ12wrbJg/embed?runtime=rive-renderer"
-          src=""
-          allowfullscreen allow="autoplay"
-          title="Psalm 119:105 Interactive Hebrew Word Animation"
-          style="height:100%;"
-          onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
-        ></iframe>
+        <!-- Rive iframe — loads immediately on desktop, on tap on mobile -->
+        <div class="lazy-frame-wrap" id="rive-wrap-inner" style="aspect-ratio:4/5;display:none;">
+          <div class="frame-loader" id="rive-loader">
+            <div class="loader-ring"></div>
+            <div class="loader-label">Loading Animation</div>
+          </div>
+          <iframe
+            id="rive-frame"
+            data-src="https://rive.app/s/qOBwIARQOkmaJxQ12wrbJg/embed?runtime=rive-renderer"
+            src=""
+            allowfullscreen allow="autoplay"
+            title="Psalm 119:105 Interactive Hebrew Word Animation"
+            style="height:100%;"
+            onload="this.closest('.lazy-frame-wrap').querySelector('.frame-loader').classList.add('hidden')"
+          ></iframe>
+        </div>
       </div>
     </div>
     <div class="rive-note">* Hebrew word meanings were referenced using Strong's Expanded Exhaustive Concordance.</div>
@@ -426,8 +462,31 @@
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-// ── Lazy load iframes ──
-const lazyFrames = document.querySelectorAll('iframe[data-src]');
+// ── Rive — tap to load on mobile, auto-load on desktop ──
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+function loadRive() {
+  const preview = document.getElementById('rive-preview');
+  const wrap = document.getElementById('rive-wrap-inner');
+  const frame = document.getElementById('rive-frame');
+  if(preview) preview.style.display = 'none';
+  if(wrap) wrap.style.display = 'block';
+  if(frame && frame.dataset.src) frame.src = frame.dataset.src;
+}
+
+// On desktop load Rive automatically when scrolled to
+if(!isMobile) {
+  const riveObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) { loadRive(); riveObserver.disconnect(); }
+    });
+  }, {rootMargin:'200px', threshold:0.01});
+  const riveSection = document.getElementById('rive-section');
+  if(riveSection) riveObserver.observe(riveSection);
+}
+
+// ── Lazy load remaining iframes (Sketchfab + YouTube) ──
+const lazyFrames = document.querySelectorAll('iframe[data-src]:not(#rive-frame)');
 const frameObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if(entry.isIntersecting) {
